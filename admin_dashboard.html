@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="GeoGiardini" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icons/leaf-192.png" />
-    <title>Admin Dashboard - GeoGiardini</title>
+    <title>Pannello Amministratore - GeoGiardini</title>
     <link rel="icon" type="image/png" href="/icons/logo.png" />
     <style>
       :root {
@@ -37,10 +37,27 @@
         gap: 1rem;
         flex-wrap: wrap;
       }
-      .top-bar h1 {
+      .dashboard-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
         margin: 0;
         font-size: clamp(1.75rem, 2.2vw, 2.5rem);
         letter-spacing: 0.02em;
+        color: #fff;
+      }
+      .dashboard-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .dashboard-icon img {
+        width: 20px;
+        height: 20px;
       }
       .top-bar .actions {
         display: flex;
@@ -64,72 +81,26 @@
         transform: translateY(-1px);
         background-color: #631712;
       }
-      .hero-card {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: minmax(0, 1fr);
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 24px;
-        padding: 1.75rem;
-        margin-top: 1.5rem;
-        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.14);
-      }
-      .hero-title {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-      .hero-title h2 {
-        margin: 0;
-        font-size: clamp(1.5rem, 2vw, 2rem);
-        color: #1b5e20;
-      }
-      .hero-title p {
-        margin: 0;
-        line-height: 1.6;
-        color: #33691e;
-      }
-      .hero-meta {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 0.75rem;
-        align-items: center;
-      }
-      .chip {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.7rem 1rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.9);
-        color: #1b5e20;
-        font-weight: 700;
-        font-size: 0.88rem;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-      }
-      .chip::before {
-        content: "◆";
-        color: #2e7d32;
-        font-size: 0.8rem;
-      }
       .diamond-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1rem;
-        margin-top: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.9rem;
+        margin-top: 1.75rem;
       }
       .diamond-card {
         position: relative;
         aspect-ratio: 1 / 1;
-        min-height: 180px;
-        background: rgba(255, 255, 255, 0.96);
-        border-radius: 26px;
-        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
+        min-height: 140px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 22px;
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
         overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
       }
       .diamond-card::before {
         content: "";
@@ -139,77 +110,34 @@
         background:
           radial-gradient(
             circle at top left,
-            rgba(255, 255, 255, 0.9),
-            transparent 40%
+            rgba(255, 255, 255, 0.96),
+            transparent 35%
           ),
           linear-gradient(
             135deg,
-            rgba(129, 199, 132, 0.18),
-            rgba(46, 125, 50, 0.12)
+            rgba(129, 199, 132, 0.2),
+            rgba(46, 125, 50, 0.1)
           );
       }
       .diamond-content {
         position: relative;
-        width: 75%;
-        height: 75%;
+        width: 88%;
+        height: 88%;
         display: grid;
         place-items: center;
-        transform: rotate(-45deg);
         text-align: center;
+        padding: 0.5rem;
       }
       .diamond-content h3 {
         margin: 0;
         font-size: 1rem;
         text-transform: uppercase;
-        letter-spacing: 0.07em;
+        letter-spacing: 0.08em;
         color: #1b5e20;
       }
-      .diamond-content p {
-        margin: 0.75rem 0 0;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        color: #2e7d32;
-      }
-      .diamond-content a {
-        margin-top: 1rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        padding: 0.6rem 1rem;
-        border-radius: 999px;
-        background: #2e7d32;
-        color: #fff;
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 700;
-      }
-      .section-description {
-        margin-top: 1.5rem;
-        display: grid;
-        gap: 1rem;
-      }
-      .section-description p {
-        margin: 0;
-        color: #fff;
-        line-height: 1.7;
-      }
-      .status {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.55rem 0.9rem;
-        border-radius: 999px;
-        background: #dcedc8;
-        color: #33691e;
-        font-weight: 700;
-        margin-top: 0.5rem;
-      }
-      .version-label {
-        margin-top: 0.5rem;
-        display: inline-block;
-        color: #e8f5e9;
-        font-weight: 700;
+      .diamond-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.16);
       }
       @media (max-width: 900px) {
         .diamond-content h3 {
@@ -223,11 +151,8 @@
         .page {
           padding: 1rem;
         }
-        .hero-card {
-          padding: 1.25rem;
-        }
         .diamond-card {
-          min-height: 160px;
+          min-height: 120px;
         }
       }
     </style>
@@ -236,83 +161,46 @@
     <div class="page">
       <div class="top-bar">
         <div>
-          <h1>Admin Dashboard</h1>
-          <div class="status">Accesso: Admin</div>
-          <div class="version-label" id="versionLabel">v009</div>
+          <h1 class="dashboard-title">
+            <span class="dashboard-icon"
+              ><img src="/icons/logo.png" alt="Icona"
+            /></span>
+            Pannello Amministratore
+          </h1>
         </div>
         <div class="actions">
           <a href="#" id="logoutLink">Logout</a>
         </div>
       </div>
-      <div class="hero-card">
-        <div class="hero-title">
-          <h2>Area amministratore</h2>
-          <p>
-            Qui puoi gestire giardinieri, clienti, lavori, foto, messaggi,
-            notifiche e le esportazioni PDF del sistema GeoGiardini.
-          </p>
-        </div>
-        <div class="hero-meta">
-          <span class="chip">Giardinieri</span>
-          <span class="chip">Clienti</span>
-          <span class="chip">Lavori</span>
-          <span class="chip">Foto</span>
-          <span class="chip">Messaggi</span>
-        </div>
-      </div>
       <div class="diamond-grid">
         <div class="diamond-card">
           <div class="diamond-content">
-            <h3>Gestione Giardinieri</h3>
-            <p>Modifica profili, attiva/disattiva account e assegna codici.</p>
-            <a href="#">Apri</a>
+            <h3>Giardinieri</h3>
           </div>
         </div>
         <div class="diamond-card">
           <div class="diamond-content">
-            <h3>Gestione Clienti</h3>
-            <p>Controlla clienti, indirizzi e richieste in modo veloce.</p>
-            <a href="#">Apri</a>
+            <h3>Clienti</h3>
           </div>
         </div>
         <div class="diamond-card">
           <div class="diamond-content">
-            <h3>Assegnazioni & Lavori</h3>
-            <p>Organizza le attività e tieni traccia dello stato dei lavori.</p>
-            <a href="#">Apri</a>
+            <h3>Lavori</h3>
           </div>
         </div>
         <div class="diamond-card">
           <div class="diamond-content">
-            <h3>Messaggi & Notifiche</h3>
-            <p>Invia avvisi, leggi cronologia e tieni il team aggiornato.</p>
-            <a href="#">Apri</a>
+            <h3>Messaggi</h3>
           </div>
         </div>
         <div class="diamond-card">
           <div class="diamond-content">
-            <h3>Foto, Documenti & PDF</h3>
-            <p>Gestisci upload, report e la tua raccolta Dropbox.</p>
-            <a href="#">Apri</a>
+            <h3>Foto</h3>
           </div>
         </div>
       </div>
     </div>
     <script>
-      async function fetchVersion() {
-        try {
-          const response = await fetch(`/version.txt?cacheBust=${Date.now()}`);
-          if (response.ok) {
-            const version = (await response.text()).trim();
-            document.title = `Admin Dashboard - GeoGiardini ${version}`;
-            document.getElementById("versionLabel").textContent = version;
-          }
-        } catch (error) {
-          console.error("Errore nel recupero della versione:", error);
-        }
-      }
-      fetchVersion();
-
       function initPage() {
         const logoutLink = document.getElementById("logoutLink");
         if (logoutLink) {

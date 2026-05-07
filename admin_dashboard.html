@@ -83,61 +83,42 @@
       }
       .diamond-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 0.9rem;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
         margin-top: 1.75rem;
       }
       .diamond-card {
-        position: relative;
-        aspect-ratio: 1 / 1;
-        min-height: 140px;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 22px;
-        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
-        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition:
-          transform 0.2s ease,
-          box-shadow 0.2s ease;
-      }
-      .diamond-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        transform: rotate(45deg);
-        background:
-          radial-gradient(
-            circle at top left,
-            rgba(255, 255, 255, 0.96),
-            transparent 35%
-          ),
-          linear-gradient(
-            135deg,
-            rgba(129, 199, 132, 0.2),
-            rgba(46, 125, 50, 0.1)
-          );
+        min-height: 120px;
+        background: #ffffff;
+        border: 2px solid rgba(46, 125, 50, 0.35);
+        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
       .diamond-content {
-        position: relative;
-        width: 88%;
-        height: 88%;
+        width: 80%;
         display: grid;
         place-items: center;
+        gap: 0.35rem;
         text-align: center;
         padding: 0.5rem;
       }
+      .diamond-icon {
+        font-size: 1.35rem;
+        line-height: 1;
+      }
       .diamond-content h3 {
         margin: 0;
-        font-size: 1rem;
-        text-transform: uppercase;
+        font-size: 0.95rem;
         letter-spacing: 0.08em;
         color: #1b5e20;
       }
       .diamond-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.16);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.15);
       }
       @media (max-width: 900px) {
         .diamond-content h3 {
@@ -165,7 +146,7 @@
             <span class="dashboard-icon"
               ><img src="/icons/logo.png" alt="Icona"
             /></span>
-            Pannello Amministratore
+            <span id="dashboardTitleText">Pannello Amministratore</span>
           </h1>
         </div>
         <div class="actions">
@@ -175,26 +156,31 @@
       <div class="diamond-grid">
         <div class="diamond-card">
           <div class="diamond-content">
+            <div class="diamond-icon">👩‍🌾</div>
             <h3>Giardinieri</h3>
           </div>
         </div>
         <div class="diamond-card">
           <div class="diamond-content">
+            <div class="diamond-icon">👥</div>
             <h3>Clienti</h3>
           </div>
         </div>
         <div class="diamond-card">
           <div class="diamond-content">
+            <div class="diamond-icon">🛠️</div>
             <h3>Lavori</h3>
           </div>
         </div>
         <div class="diamond-card">
           <div class="diamond-content">
+            <div class="diamond-icon">💬</div>
             <h3>Messaggi</h3>
           </div>
         </div>
         <div class="diamond-card">
           <div class="diamond-content">
+            <div class="diamond-icon">📸</div>
             <h3>Foto</h3>
           </div>
         </div>
@@ -211,6 +197,21 @@
         }
       }
 
+      function setDashboardGreeting() {
+        const titleText = document.getElementById("dashboardTitleText");
+        const username = localStorage.getItem("geogiardini_username");
+        const role = localStorage.getItem("geogiardini_role");
+        if (titleText) {
+          if (username && role === "admin") {
+            titleText.textContent = `Ciao ${username} (amministratore)`;
+          } else if (username) {
+            titleText.textContent = `Ciao ${username}`;
+          } else {
+            titleText.textContent = "Pannello Amministratore";
+          }
+        }
+      }
+
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
@@ -220,6 +221,7 @@
             });
         });
       }
+      setDashboardGreeting();
       initPage();
     </script>
   </body>

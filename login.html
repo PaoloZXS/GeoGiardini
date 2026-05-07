@@ -250,6 +250,8 @@
       function isAppInstalled() {
         return (
           window.matchMedia("(display-mode: standalone)").matches ||
+          window.matchMedia("(display-mode: fullscreen)").matches ||
+          window.matchMedia("(display-mode: minimal-ui)").matches ||
           window.navigator.standalone === true
         );
       }
@@ -276,10 +278,8 @@
       }
 
       function handleExitClick() {
-        if (
-          window.matchMedia("(display-mode: standalone)").matches ||
-          window.navigator.standalone === true
-        ) {
+        if (isAppInstalled()) {
+          window.open("", "_self").close();
           window.close();
           setTimeout(() => {
             alert(

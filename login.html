@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - GeoGiardini</title>
+    <title>Login - GeoGiardini v002</title>
     <link rel="stylesheet" href="global.css" />
+    <link rel="icon" href="icons/leaf-192.png" type="image/png" />
     <style>
       body {
         font-family: "Arial", sans-serif;
@@ -94,6 +95,20 @@
       </p>
     </div>
     <script>
+      async function fetchVersion() {
+        try {
+          const response = await fetch("/version.txt");
+          if (response.ok) {
+            const version = await response.text();
+            document.title = `Login - GeoGiardini ${version.trim()}`;
+          }
+        } catch (error) {
+          console.error("Errore nel recupero della versione:", error);
+        }
+      }
+
+      fetchVersion();
+
       document
         .getElementById("loginForm")
         .addEventListener("submit", async function (event) {

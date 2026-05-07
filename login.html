@@ -3,44 +3,124 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - GeoGiardini v002</title>
+    <title>Login - GeoGiardini</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2e7d32" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="GeoGiardini" />
+    <link rel="apple-touch-icon" href="/icons/leaf-192.png" />
     <link rel="stylesheet" href="global.css" />
-    <link rel="icon" type="image/png" href="icons/logo.png" />
+    <link rel="icon" type="image/png" href="/icons/logo.png" />
     <style>
+      html,
       body {
-        font-family: "Arial", sans-serif;
-        background: linear-gradient(to bottom, #81c784, #2e7d32);
-        color: #1b5e20;
-        display: flex;
-        justify-content: center;
-        align-items: center;
         height: 100vh;
+        min-height: 100vh;
         margin: 0;
-        background-attachment: fixed;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        position: relative;
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(to bottom, #81c784 0%, #2e7d32 100%);
+        color: #1b5e20;
+        width: 100%;
+        overflow: hidden;
       }
       .login-container {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 2rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.95);
+        padding: 1.75rem;
         border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
         text-align: center;
-        width: 90%;
-        max-width: 400px;
+        width: min(90vw, 380px);
+        max-width: 380px;
+        margin: 0;
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+        box-sizing: border-box;
       }
       .login-container h1 {
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.25rem;
         font-size: 1.8rem;
         color: #2e7d32;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .login-container h1 img {
+        margin-right: 8px;
+        vertical-align: middle;
+        width: 32px;
+        height: 32px;
+      }
+      .welcome-message {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        color: #1b5e20;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .version-footer {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #c8e6c9;
+      }
+      .footer-version {
+        margin: 0.75rem 0 0;
+        color: #4d7f33;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .install-button {
+        margin-top: 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        background: #4d7f33;
+        color: #ffffff;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .install-button:hover {
+        background: #33691e;
+      }
+      .install-button.hidden {
+        display: none;
+      }
+      .input-label {
+        display: block;
+        text-align: left;
+        margin: 0 0 0.25rem 0.25rem;
+        font-size: 0.85rem;
+        color: #1b5e20;
+        font-weight: 700;
       }
       .login-container input {
         width: 100%;
+        box-sizing: border-box;
         padding: 0.75rem;
         margin-bottom: 1rem;
         border: 1px solid #81c784;
         border-radius: 8px;
         font-size: 1rem;
       }
-      .login-container button {
+      .login-container button[type="submit"] {
         background-color: #2e7d32;
         color: #ffffff;
         border: none;
@@ -51,13 +131,30 @@
         width: 100%;
         transition: background-color 0.3s;
       }
-      .login-container button:hover {
+      .login-container button[type="submit"]:hover {
         background-color: #1b5e20;
+      }
+      .exit-button {
+        background-color: #b74129;
+        color: #ffffff;
+        border: 1px solid #8c3422;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 1rem;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+      .exit-button:hover {
+        background-color: #9f3721;
       }
       .login-container .icon {
         margin-bottom: 1rem;
       }
-      .login-container p {
+      #errorMessage {
         font-size: 0.9rem;
         color: #ff0000;
       }
@@ -73,15 +170,28 @@
   </head>
   <body>
     <div class="login-container">
-      <img src="icons/leaf-192.png" alt="GeoGiardini" class="icon" width="64" />
-      <h1>Benvenuto su GeoGiardini</h1>
+      <h1>
+        <img
+          src="/icons/logo.png"
+          alt="Icona GeoGiardini"
+          width="32"
+          height="32"
+          style="vertical-align: middle; margin-right: 8px"
+        />
+        GeoGiardini
+      </h1>
+      <p class="welcome-message" id="welcomeMessage" style="color: #1b5e20">
+        Benvenuto su GeoGiardini
+      </p>
       <form id="loginForm">
+        <label for="username" class="input-label">USERNAME</label>
         <input
           type="text"
           id="username"
           placeholder="Inserisci il tuo username"
           required
         />
+        <label for="code" class="input-label">CODICE</label>
         <input
           type="password"
           id="code"
@@ -89,7 +199,17 @@
           required
         />
         <button type="submit">Accedi</button>
+        <button type="button" class="exit-button" id="exitButton">Esci</button>
       </form>
+      <div class="version-footer">
+        <p class="footer-text">Powered Spectrum Italia 2026</p>
+        <p class="footer-version" id="pageVersion">
+          Versione in caricamento...
+        </p>
+        <button type="button" id="installButton" class="install-button">
+          Installa GeoGiardini
+        </button>
+      </div>
       <p id="errorMessage" style="display: none">
         Credenziali non valide. Riprova.
       </p>
@@ -97,17 +217,110 @@
     <script>
       async function fetchVersion() {
         try {
-          const response = await fetch("/version.txt");
+          const response = await fetch(`/version.txt?cacheBust=${Date.now()}`);
+          const pageVersion = document.getElementById("pageVersion");
           if (response.ok) {
             const version = await response.text();
-            document.title = `Login - GeoGiardini ${version.trim()}`;
+            const trimmedVersion = version.trim();
+            const displayVersion = trimmedVersion.startsWith("v")
+              ? trimmedVersion.slice(1)
+              : trimmedVersion;
+            document.title = `Login - GeoGiardini ${trimmedVersion}`;
+            if (pageVersion) {
+              pageVersion.textContent = `Versione ${displayVersion}`;
+            }
+          } else if (pageVersion) {
+            pageVersion.textContent = "Versione non disponibile";
           }
         } catch (error) {
           console.error("Errore nel recupero della versione:", error);
+          const pageVersion = document.getElementById("pageVersion");
+          if (pageVersion) {
+            pageVersion.textContent = "Versione non disponibile";
+          }
         }
       }
 
       fetchVersion();
+
+      let deferredPrompt = null;
+      const installButton = document.getElementById("installButton");
+
+      function isAppInstalled() {
+        return (
+          window.matchMedia("(display-mode: standalone)").matches ||
+          window.navigator.standalone === true
+        );
+      }
+
+      if (installButton && isAppInstalled()) {
+        installButton.classList.add("hidden");
+      }
+
+      function showInstallFallback() {
+        const message =
+          "Puoi installare GeoGiardini dal browser selezionando 'Aggiungi a schermata Home' nel menu del browser.";
+        alert(message);
+      }
+
+      window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
+      });
+
+      if (installButton) {
+        installButton.addEventListener("click", async () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const choiceResult = await deferredPrompt.userChoice;
+            if (choiceResult.outcome === "accepted") {
+              installButton.textContent = "App installata";
+              installButton.classList.add("hidden");
+              installButton.disabled = true;
+            }
+            deferredPrompt = null;
+          } else {
+            showInstallFallback();
+          }
+        });
+      }
+
+      const exitButton = document.getElementById("exitButton");
+      if (exitButton) {
+        exitButton.addEventListener("click", () => {
+          if (
+            window.matchMedia("(display-mode: standalone)").matches ||
+            window.navigator.standalone === true
+          ) {
+            window.close();
+            setTimeout(() => {
+              alert(
+                "Se l'app non si chiude automaticamente, chiudila manualmente."
+              );
+            }, 500);
+          } else {
+            alert(
+              "Questa funzione è disponibile solo quando l'app è installata. Chiudi la scheda o la finestra del browser."
+            );
+          }
+        });
+      }
+
+      window.addEventListener("appinstalled", () => {
+        if (installButton) {
+          installButton.classList.add("hidden");
+        }
+      });
+
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .catch((error) => {
+              console.error("Service worker registration failed:", error);
+            });
+        });
+      }
 
       document
         .getElementById("loginForm")
@@ -128,7 +341,11 @@
           if (response.ok) {
             const result = await response.json();
             if (result.success) {
-              window.location.href = "/dashboard.html";
+              if (result.role === "admin") {
+                window.location.href = "/admin_dashboard.html";
+              } else {
+                window.location.href = "/dashboard.html";
+              }
             } else {
               document.getElementById("errorMessage").style.display = "block";
             }

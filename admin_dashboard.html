@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - GeoGiardini</title>
+    <link rel="icon" type="image/png" href="/icons/logo.png" />
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(180deg, #81c784 0%, #2e7d32 100%);
+        color: #1b5e20;
+      }
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1rem 4rem;
+      }
+      .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .top-bar h1 {
+        margin: 0;
+        font-size: 2rem;
+      }
+      .top-bar .actions {
+        display: flex;
+        gap: 0.75rem;
+      }
+      .top-bar .actions a {
+        display: inline-flex;
+        padding: 0.8rem 1.2rem;
+        background: #2e7d32;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 700;
+      }
+      .welcome-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 18px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      }
+      .welcome-card p {
+        margin: 0.5rem 0 0;
+        color: #2e7d32;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 18px;
+        padding: 1.5rem;
+        min-height: 160px;
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+      }
+      .card h2 {
+        margin-top: 0;
+        font-size: 1.2rem;
+        color: #2e7d32;
+      }
+      .card p {
+        margin: 0.75rem 0 0;
+        line-height: 1.5;
+      }
+      .card a {
+        display: inline-block;
+        margin-top: 1rem;
+        color: #2e7d32;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 999px;
+        background: #dcedc8;
+        color: #33691e;
+        font-weight: 700;
+        margin-top: 1rem;
+      }
+      .version-label {
+        margin-top: 1rem;
+        display: inline-block;
+        color: #33691e;
+        font-weight: 700;
+      }
+      @media (max-width: 768px) {
+        .top-bar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="top-bar">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <div class="status">Accesso: Admin</div>
+          <div class="version-label" id="versionLabel">v009</div>
+        </div>
+        <div class="actions">
+          <a href="/login.html">Logout</a>
+        </div>
+      </div>
+      <div class="welcome-card">
+        <p>Benvenuto Angelo, ora puoi gestire l'intero sistema GeoGiardini.</p>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h2>Gestione Giardinieri</h2>
+          <p>
+            Visualizza, modifica e aggiungi giardinieri con privilegi e
+            assegnazioni.
+          </p>
+          <a href="#">Apri gestione</a>
+        </div>
+        <div class="card">
+          <h2>Gestione Clienti</h2>
+          <p>
+            Controlla i clienti, le richieste e lo stato dei lavori in corso.
+          </p>
+          <a href="#">Apri gestione</a>
+        </div>
+        <div class="card">
+          <h2>Assegnazioni e Lavori</h2>
+          <p>
+            Distribuisci i lavori, modifica assegnazioni e monitora avanzamento.
+          </p>
+          <a href="#">Apri gestione</a>
+        </div>
+        <div class="card">
+          <h2>Foto e Documenti</h2>
+          <p>
+            Gestisci i file caricati dai giardinieri e mantieni il catalogo
+            aggiornato.
+          </p>
+          <a href="#">Apri gestione</a>
+        </div>
+      </div>
+    </div>
+    <script>
+      async function fetchVersion() {
+        try {
+          const response = await fetch(`/version.txt?cacheBust=${Date.now()}`);
+          if (response.ok) {
+            const version = (await response.text()).trim();
+            document.title = `Admin Dashboard - GeoGiardini ${version}`;
+            document.getElementById("versionLabel").textContent = version;
+          }
+        } catch (error) {
+          console.error("Errore nel recupero della versione:", error);
+        }
+      }
+      fetchVersion();
+    </script>
+  </body>
+</html>

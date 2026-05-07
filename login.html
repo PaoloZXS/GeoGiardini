@@ -244,7 +244,8 @@
       fetchVersion();
 
       let deferredPrompt = null;
-      const installButton = document.getElementById("installButton");
+      let installButton = null;
+      let exitButton = null;
 
       function isAppInstalled() {
         return (
@@ -253,58 +254,77 @@
         );
       }
 
-      if (installButton && isAppInstalled()) {
-        installButton.classList.add("hidden");
-      }
-
       function showInstallFallback() {
         const message =
           "Puoi installare GeoGiardini dal browser selezionando 'Aggiungi a schermata Home' nel menu del browser.";
         alert(message);
       }
 
+      async function handleInstallClick() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const choiceResult = await deferredPrompt.userChoice;
+          if (choiceResult.outcome === "accepted") {
+            installButton.textContent = "App installata";
+            installButton.classList.add("hidden");
+            installButton.disabled = true;
+          }
+          deferredPrompt = null;
+        } else {
+          showInstallFallback();
+        }
+      }
+
+      function handleExitClick() {
+        if (
+          window.matchMedia("(display-mode: standalone)").matches ||
+          window.navigator.standalone === true
+        ) {
+          window.close();
+          setTimeout(() => {
+            alert(
+              "Se l'app non si chiude automaticamente, chiudila manualmente."
+            );
+          }, 500);
+        } else {
+          alert(
+            "Questa funzione è disponibile solo quando l'app è installata. Chiudi la scheda o la finestra del browser."
+          );
+        }
+      }
+
+      function initializeLoginButtons() {
+        installButton = document.getElementById("installButton");
+        exitButton = document.getElementById("exitButton");
+
+        if (installButton) {
+          installButton.classList.toggle("hidden", isAppInstalled());
+          installButton.removeEventListener("click", handleInstallClick);
+          installButton.addEventListener("click", handleInstallClick);
+          installButton.onclick = handleInstallClick;
+        }
+
+        if (exitButton) {
+          exitButton.removeEventListener("click", handleExitClick);
+          exitButton.addEventListener("click", handleExitClick);
+          exitButton.onclick = handleExitClick;
+        }
+      }
+
+      function initLoginPage() {
+        initializeLoginButtons();
+      }
+
+      document.addEventListener("DOMContentLoaded", initLoginPage);
+      window.addEventListener("pageshow", () => {
+        initLoginPage();
+      });
+      initLoginPage();
+
       window.addEventListener("beforeinstallprompt", (event) => {
         event.preventDefault();
         deferredPrompt = event;
       });
-
-      if (installButton) {
-        installButton.addEventListener("click", async () => {
-          if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const choiceResult = await deferredPrompt.userChoice;
-            if (choiceResult.outcome === "accepted") {
-              installButton.textContent = "App installata";
-              installButton.classList.add("hidden");
-              installButton.disabled = true;
-            }
-            deferredPrompt = null;
-          } else {
-            showInstallFallback();
-          }
-        });
-      }
-
-      const exitButton = document.getElementById("exitButton");
-      if (exitButton) {
-        exitButton.addEventListener("click", () => {
-          if (
-            window.matchMedia("(display-mode: standalone)").matches ||
-            window.navigator.standalone === true
-          ) {
-            window.close();
-            setTimeout(() => {
-              alert(
-                "Se l'app non si chiude automaticamente, chiudila manualmente."
-              );
-            }, 500);
-          } else {
-            alert(
-              "Questa funzione è disponibile solo quando l'app è installata. Chiudi la scheda o la finestra del browser."
-            );
-          }
-        });
-      }
 
       window.addEventListener("appinstalled", () => {
         if (installButton) {

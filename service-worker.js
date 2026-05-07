@@ -1,10 +1,11 @@
-const CACHE_NAME = "geogiardini-cache-v3";
+const CACHE_NAME = "geogiardini-cache-v4";
 const urlsToCache = [
   "/",
   "/login.html",
   "/dashboard.html",
   "/admin_dashboard.html",
   "/manifest.json",
+  "/version.txt",
   "/icons/leaf-192.png",
   "/icons/leaf-512.png",
   "/icons/logo.png"

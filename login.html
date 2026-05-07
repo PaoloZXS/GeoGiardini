@@ -286,9 +286,18 @@
           // ignore
         }
         setTimeout(() => {
-          alert(
-            "Se l'app non si chiude automaticamente, chiudila manualmente."
-          );
+          if (!window.closed) {
+            document.title = "GeoGiardini - Esci";
+            document.body.innerHTML = `
+              <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f8f0ec; color:#2e7d32; padding:2rem; text-align:center; font-family:Arial,sans-serif;">
+                <div>
+                  <h1 style="margin-bottom:1rem;">Esci da GeoGiardini</h1>
+                  <p style="font-size:1rem; margin-bottom:1.5rem;">La chiusura automatica non è consentita in questo ambiente.</p>
+                  <p style="font-size:0.95rem; color:#6d4c41;">Chiudi la finestra o l'app con i controlli del sistema.</p>
+                </div>
+              </div>
+            `;
+          }
         }, 500);
       }
 

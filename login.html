@@ -278,19 +278,18 @@
       }
 
       function handleExitClick() {
-        if (isAppInstalled()) {
-          window.open("", "_self").close();
-          window.close();
-          setTimeout(() => {
-            alert(
-              "Se l'app non si chiude automaticamente, chiudila manualmente."
-            );
-          }, 500);
-        } else {
-          alert(
-            "Questa funzione è disponibile solo quando l'app è installata. Chiudi la scheda o la finestra del browser."
-          );
+        window.open("", "_self").close();
+        window.close();
+        try {
+          window.top.close();
+        } catch (error) {
+          // ignore
         }
+        setTimeout(() => {
+          alert(
+            "Se l'app non si chiude automaticamente, chiudila manualmente."
+          );
+        }, 500);
       }
 
       function initializeLoginButtons() {
@@ -316,6 +315,7 @@
       }
 
       document.addEventListener("DOMContentLoaded", initLoginPage);
+      window.addEventListener("load", initLoginPage);
       window.addEventListener("pageshow", () => {
         initLoginPage();
       });

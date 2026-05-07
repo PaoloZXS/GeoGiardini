@@ -124,15 +124,18 @@
       .diamond-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 1rem;
+        justify-content: center;
+        gap: 0.9rem;
         margin-top: 1.75rem;
         flex: 1;
       }
       .diamond-card {
+        width: 100%;
+        max-width: 160px;
+        aspect-ratio: 1 / 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 120px;
         background: #ffffff;
         border: 2px solid rgba(46, 125, 50, 0.35);
         clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);

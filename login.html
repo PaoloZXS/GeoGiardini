@@ -158,6 +158,16 @@
         font-size: 0.9rem;
         color: #ff0000;
       }
+      #exitMessage {
+        display: none;
+        font-size: 0.95rem;
+        color: #2e7d32;
+        background: #f1f5f1;
+        border: 1px solid #c8e6c9;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-top: 1rem;
+      }
       @media (min-width: 768px) {
         .login-container {
           padding: 3rem;
@@ -213,6 +223,7 @@
       <p id="errorMessage" style="display: none">
         Credenziali non valide. Riprova.
       </p>
+      <p id="exitMessage"></p>
     </div>
     <script>
       async function fetchVersion() {
@@ -277,6 +288,15 @@
         }
       }
 
+      function showExitBlockedMessage() {
+        const exitMessage = document.getElementById("exitMessage");
+        if (exitMessage) {
+          exitMessage.textContent =
+            "Non è possibile chiudere automaticamente l'app in questo ambiente. Chiudi la finestra o l'app con i controlli del sistema.";
+          exitMessage.style.display = "block";
+        }
+      }
+
       function handleExitClick() {
         window.open("", "_self").close();
         window.close();
@@ -287,16 +307,7 @@
         }
         setTimeout(() => {
           if (!window.closed) {
-            document.title = "GeoGiardini - Esci";
-            document.body.innerHTML = `
-              <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f8f0ec; color:#2e7d32; padding:2rem; text-align:center; font-family:Arial,sans-serif;">
-                <div>
-                  <h1 style="margin-bottom:1rem;">Esci da GeoGiardini</h1>
-                  <p style="font-size:1rem; margin-bottom:1.5rem;">La chiusura automatica non è consentita in questo ambiente.</p>
-                  <p style="font-size:0.95rem; color:#6d4c41;">Chiudi la finestra o l'app con i controlli del sistema.</p>
-                </div>
-              </div>
-            `;
+            showExitBlockedMessage();
           }
         }, 500);
       }

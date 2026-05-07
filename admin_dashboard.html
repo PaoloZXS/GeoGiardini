@@ -192,15 +192,25 @@
           font-size: 1.35rem;
         }
         .diamond-grid {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: 0.18rem 0.35rem;
           margin-top: 3.2rem;
+          justify-items: center;
+        }
+        .diamond-grid > .diamond-card:nth-child(1) {
+          grid-column: 1;
+        }
+        .diamond-grid > .diamond-card:nth-child(2) {
+          grid-column: 3;
+        }
+        .diamond-grid > .diamond-card:nth-child(3) {
+          grid-column: 5;
         }
         .diamond-grid > .diamond-card:nth-child(4) {
           grid-column: 2;
         }
         .diamond-grid > .diamond-card:nth-child(5) {
-          grid-column: 3;
+          grid-column: 4;
         }
         .diamond-card {
           max-width: 90px;

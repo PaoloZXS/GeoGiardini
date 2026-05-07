@@ -81,6 +81,43 @@
         transform: translateY(-1px);
         background-color: #631712;
       }
+      .dashboard-footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        display: grid;
+        gap: 1rem;
+        align-items: center;
+      }
+      .dashboard-separator {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.35);
+        width: 100%;
+      }
+      .logout-bottom {
+        width: 100%;
+        max-width: 320px;
+        justify-self: center;
+        padding: 0.85rem 1.2rem;
+        border: none;
+        border-radius: 999px;
+        background: #7b241c;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          background-color 0.2s ease;
+      }
+      .logout-bottom:hover {
+        transform: translateY(-1px);
+        background-color: #631712;
+      }
+      .footer-note {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.9rem;
+        text-align: center;
+      }
       .diamond-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -96,7 +133,9 @@
         border: 2px solid rgba(46, 125, 50, 0.35);
         clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
       }
       .diamond-content {
         width: 80%;
@@ -149,9 +188,6 @@
             <span id="dashboardTitleText">Pannello Amministratore</span>
           </h1>
         </div>
-        <div class="actions">
-          <a href="#" id="logoutLink">Logout</a>
-        </div>
       </div>
       <div class="diamond-grid">
         <div class="diamond-card">
@@ -185,6 +221,11 @@
           </div>
         </div>
       </div>
+      <div class="dashboard-footer">
+        <div class="dashboard-separator"></div>
+        <button class="logout-bottom" id="logoutLink">Logout</button>
+        <p class="footer-note">Powered Spectrum Italia 2026</p>
+      </div>
     </div>
     <script>
       function initPage() {
@@ -203,7 +244,7 @@
         const role = localStorage.getItem("geogiardini_role");
         if (titleText) {
           if (username && role === "admin") {
-            titleText.textContent = `Ciao ${username} (amministratore)`;
+            titleText.textContent = `Ciao ${username}`;
           } else if (username) {
             titleText.textContent = `Ciao ${username}`;
           } else {

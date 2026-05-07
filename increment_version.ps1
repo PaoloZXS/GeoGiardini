@@ -9,7 +9,7 @@ if ($versionText -match '^\s*v(\d+)\s*$') {
   $currentNumber = [int]$matches[1]
   $nextNumber = $currentNumber + 1
   $nextVersion = "v{0:000}" -f $nextNumber
-  Set-Content -Path $versionFile -Value $nextVersion -Encoding UTF8
+  Set-Content -Path $versionFile -Value $nextVersion -Encoding UTF8NoBOM
   Write-Host "Versione aggiornata da $versionText a $nextVersion"
 } else {
   Write-Error "Formato versione non valido in version.txt: '$versionText'"

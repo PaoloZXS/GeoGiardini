@@ -1,0 +1,49 @@
+# Istruzioni per Versioning e Deploy
+
+## Procedura Obbligatoria ad Ogni Modifica
+
+1. **Aggiornamento Versione**:
+   - La versione iniziale è `v001`.
+   - Incrementare di 1 ad ogni modifica (es. `v001` → `v002`).
+   - Salvare la nuova versione nel file `version.txt`.
+
+2. **Commit e Push**:
+   - Eseguire il commit delle modifiche con un messaggio chiaro.
+     ```bash
+     git add .
+     git commit -m "Aggiornamento versione a vXXX e modifiche al codice"
+     ```
+   - Effettuare il push su Vercel:
+     ```bash
+     git push
+     ```
+
+3. **Deploy su Vercel**:
+   - Il push attiverà automaticamente il deploy su Vercel.
+
+## Automazione
+Per automatizzare il processo:
+
+1. **Script per Aggiornamento Versione**:
+   Creare uno script `update_version.sh`:
+   ```bash
+   #!/bin/bash
+   VERSION_FILE="version.txt"
+   CURRENT_VERSION=$(cat $VERSION_FILE)
+   NEXT_VERSION=$(printf "v%03d" $((10#${CURRENT_VERSION:1} + 1)))
+   echo $NEXT_VERSION > $VERSION_FILE
+   git add $VERSION_FILE
+   git commit -m "Aggiornamento versione a $NEXT_VERSION"
+   git push
+   ```
+
+2. **Esecuzione Automatica**:
+   - Aggiungere lo script come pre-commit hook in Git:
+     ```bash
+     echo "bash update_version.sh" > .git/hooks/pre-commit
+     chmod +x .git/hooks/pre-commit
+     ```
+   - Questo garantirà che la versione venga aggiornata automaticamente ad ogni commit.
+
+## Nota
+Assicurarsi che il file `version.txt` esista e contenga la versione iniziale `v001` prima di iniziare.

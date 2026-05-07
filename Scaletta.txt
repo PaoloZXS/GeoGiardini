@@ -1,0 +1,114 @@
+
+STEP 1 — Struttura progetto OK
+AI consigliata: GPT‑4o
+Genera la struttura completa del progetto GeoGiardini seguendo esattamente il BLOCCO 2 del prompt. 
+Crea tutte le cartelle e tutti i file vuoti (HTML, CSS, JS) senza ancora inserire codice. 
+Crea anche global.css vuoto, manifest.json vuoto, service-worker.js vuoto. 
+Importa tutte le icone SVG del BLOCCO 3 nella cartella /icons. 
+Non generare logica, solo struttura e file vuoti.
+
+
+STEP 2 — Login + sessioni
+AI consigliata: GPT‑4o
+Implementa il sistema di login e sessioni per admin, giardiniere e cliente. 
+Usa API serverless su Vercel per validare credenziali e generare token di sessione. 
+Proteggi tutte le pagine con redirect se non loggati. 
+Non toccare altri moduli.
+
+
+STEP 3 — CRUD giardinieri / clienti / descrizioni
+AI consigliata: GPT‑4o
+Implementa i CRUD completi per giardinieri, clienti e descrizioni lavoro. 
+Genera le API serverless per create/read/update/delete. 
+Aggiorna le pagine admin corrispondenti con form, tabelle e validazioni. 
+Non 
+
+
+STEP 4 — Assegnazioni giardinieri ↔ clienti
+AI consigliata: GPT‑4o
+Implementa la pagina e le API serverless per gestire le assegnazioni giardinieri-clienti (molti-a-molti). 
+Mostra elenco giardinieri, elenco clienti e checkbox di assegnazione. 
+Aggiorna anche la dashboard giardiniere per mostrare i clienti assegnati.
+
+
+STEP 5 — Inserimento lavori + foto
+AI consigliata: GPT‑4o
+Implementa il flusso completo di inserimento lavoro per il giardiniere:
+- form con cliente, descrizione, note
+- ridimensionamento foto lato client (1600px, 80%, JPG)
+- upload foto → API serverless → Dropbox
+- salvataggio lavoro + foto in TURSO
+- messaggio automatico generato al salvataggio
+Non modificare altri moduli.
+
+
+STEP 6 — Messaggi + notifiche push
+AI consigliata: GPT‑4o
+Implementa il sistema messaggi secondo le specifiche:
+- chat unica admin↔giardiniere e admin↔cliente
+- messaggi automatici e manuali
+- allegati multipli (max 5 foto)
+- notifiche push via service worker
+- API serverless per invio, ricezione, allegati, lettura
+UI stile WhatsApp.
+
+
+STEP 7 — Ricerca lavori
+AI consigliata: GPT‑4o
+Implementa la ricerca lavori con:
+- filtri combinabili (AND)
+- full-text search
+- ordinamento per data decrescente
+- paginazione 20 risultati per pagina
+- tabella risultati
+- pagina dettaglio lavoro
+Non modificare altri moduli.
+
+
+STEP 8 — PDF
+AI consigliata: GPT‑4o
+Implementa la generazione PDF (singolo lavoro e lista filtrata) con layout definito:
+- header con logo foglia, titolo, data, versione
+- blocco informazioni
+- tabella lavori (per PDF multipli)
+- foto impaginate 3 per riga
+- footer con URL e numero pagina
+Usa pdf-lib o pdfkit in API serverless.
+
+
+STEP 9 — Gestione foto (admin)
+AI consigliata: GPT‑4o
+Implementa la pagina Gestione Foto per l’amministratore:
+- filtri (data, giardiniere, cliente, lavoro, messaggio)
+- anteprime
+- eliminazione singola/multipla
+- contatore spazio Dropbox
+API serverless per eliminazione e conteggio.
+
+
+STEP 10 — PWA completa
+AI consigliata: GPT‑4o
+Completa la PWA:
+- manifest.json con icone foglia 192/512
+- service worker con caching offline
+- installazione su Android
+- test offline
+Non modificare altri moduli.
+
+
+STEP 11 — Versioning automatico
+AI consigliata: GPT‑4o
+Implementa il versioning automatico:
+- incremento versione ad ogni deploy
+- mostra versione in dashboard admin
+- commit automatici su GitHub
+
+
+STEP 12 — Test finale
+GitHub Copilot Chat
+Esegui test completi su:
+login, sessioni, CRUD, assegnazioni, lavori, foto, messaggi, notifiche, ricerca, PDF, PWA, versioning.
+Correggi bug e ottimizza.
+
+
+

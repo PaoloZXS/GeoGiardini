@@ -1,0 +1,19 @@
+
+
+JWT_SECRET :
+geogiardini-secret-key-2026
+
+
+DROPBOX_ACCESS_TOKEN :
+dboxpat-hYv_z8eQz94AAAAAAAACf8w-J8s41X7q20z0r3iS9yv6bI8o-0_tQ
+
+
+
+Nome database:
+geogiardini
+
+TURSO_DATABASE_URL :
+libsql://geogiardini-paolozxs.aws-eu-west-1.turso.io
+
+TURSO_AUTH_TOKEN :
+eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzgwODIzMzgsImlkIjoiMDE5ZGZkOGItZWEwMS03NGI2LTkzNTUtZDgxNjI4YjEzMDlkIiwicmlkIjoiZjFjYTE4ZDktOTMxOS00MmFkLTg4NTEtNDFiODVlMTEzOTNiIn0.ZwsaKrGcqLR_THEJ9OUGCE8pOK8mRs7P8fuOhodrsDwIPrff5UVKA2oR6ePLNxRm0cpcmQmaIS1eSV7T0D16CA

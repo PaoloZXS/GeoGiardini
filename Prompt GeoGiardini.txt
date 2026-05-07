@@ -1,0 +1,1280 @@
+📌 Titolo progetto
+GeoGiardini – PWA Android + Backend TURSO + Hosting Vercel + Foto Dropbox + Notifiche + Gestione Lavori
+
+🎯 OBIETTIVO GENERALE
+Sviluppare una PWA installabile su Android, ospitata su Vercel, con database TURSO, che gestisca:
+
+Giardinieri
+
+Clienti
+
+Lavori svolti
+
+Messaggi e notifiche
+
+Foto ridimensionate automaticamente e salvate su Dropbox
+
+Ricerca avanzata dei lavori
+
+Esportazione PDF
+
+Versioning automatico
+
+UI semplice, leggibile, tema verde/natura
+
+L’app deve essere modulare, veloce, chiara, con file HTML/CSS/JS separati per ogni pagina.
+
+🏗️ ARCHITETTURA TECNICA UFFICIALE
+Frontend:
+
+PWA con frontend statico
+
+Hosting su Vercel
+
+Backend:
+
+API Routes serverless su Vercel
+
+Nessun server dedicato
+
+Tutta la logica backend deve essere implementata tramite funzioni serverless:
+
+login
+
+sessioni
+
+query TURSO
+
+upload Dropbox
+
+notifiche push
+
+generazione PDF
+
+Il client non accede mai direttamente a TURSO o Dropbox.
+
+Sicurezza, permessi e validazioni devono essere gestiti lato serverless.
+
+Le credenziali tecniche e le chiavi di configurazione verranno fornite separatamente.
+
+🧑‍💼 RUOLI UTENTI
+1. Amministratore
+Login hardcoded:
+
+Username: Angelo
+
+Codice: A2026
+
+Permessi:
+
+Gestione giardinieri (CRUD + blocco)
+
+Creazione username + codice per ogni giardiniere
+
+Gestione clienti (CRUD)
+
+Creazione username + codice per ogni cliente
+
+Gestione descrizioni lavoro (CRUD)
+
+Assegnazioni giardinieri ↔ clienti (molti-a-molti)
+
+Visualizzazione completa dei lavori
+
+Ricerca avanzata dei lavori
+
+Esportazione PDF
+
+Gestione foto su Dropbox
+
+Invio e ricezione messaggi
+
+Notifiche automatiche e manuali
+
+Cronologia messaggi
+
+Gestione spazio Dropbox
+
+2. Giardiniere
+Login con username + codice.
+
+Le credenziali vengono create dall’amministratore.
+
+Permessi:
+
+Visualizzare clienti assegnati
+
+Inserire un lavoro (cliente + descrizione + note + foto)
+
+Foto ridimensionate automaticamente prima dell’upload
+
+Invio messaggi all’amministratore
+
+Ricezione messaggi dall’amministratore
+
+3. Cliente
+Login con username + codice.
+
+Le credenziali vengono create dall’amministratore.
+
+Permessi:
+
+Visualizzare lavori svolti nel proprio giardino
+
+Filtrare per mese
+
+Esportare PDF
+
+Invio messaggi all’amministratore
+
+Ricezione messaggi dall’amministratore
+
+🗄️ DATABASE TURSO — STRUTTURA COMPLETA
+Tabella: giardinieri
+id
+
+username
+
+codice
+
+nome
+
+cognome
+
+attivo (boolean)
+
+Tabella: clienti
+id
+
+username
+
+codice
+
+nome_cliente
+
+indirizzo
+
+note
+
+Tabella: descrizioni_lavoro
+id
+
+descrizione
+
+Tabella: assegnazioni_giardinieri_clienti
+id
+
+id_giardiniere
+
+id_cliente
+
+Tabella: lavori
+id
+
+id_giardiniere
+
+id_cliente
+
+id_descrizione
+
+note
+
+data (timestamp)
+
+Tabella: messaggi
+id
+
+tipo (“manuale” / “automatico”)
+
+mittente_ruolo (“admin”, “giardiniere”, “cliente”, “sistema”)
+
+mittente_id
+
+destinatario_ruolo
+
+destinatario_id
+
+testo
+
+data
+
+letto (boolean)
+
+Tabella: foto_lavori
+id
+
+id_lavoro
+
+url
+
+nome_file
+
+data
+
+Tabella: foto_messaggi
+id
+
+id_messaggio
+
+url
+
+nome_file
+
+data
+
+Tabella: push_subscriptions
+id
+
+id_utente
+
+ruolo ("admin", "giardiniere", "cliente")
+
+endpoint
+
+p256dh
+
+auth
+
+data_registrazione
+
+📸 GESTIONE FOTO — DROPBOX
+Ridimensionamento automatico obbligatorio prima dell’upload:
+
+lato lungo: 1600px
+
+qualità: 80%
+
+formato: JPG
+
+Upload su Dropbox tramite API
+
+URL pubblico salvato in TURSO
+
+Nessuna opzione per caricare foto originali
+
+Pagina “Gestione Foto” per l’amministratore con:
+
+filtri (data, giardiniere, cliente, lavoro, messaggio)
+
+anteprime
+
+eliminazione singola
+
+eliminazione massiva (es. più vecchie di X mesi)
+
+contatore spazio Dropbox (API)
+
+🔔 NOTIFICHE PUSH
+Il codice già funzionante per l’invio delle notifiche push verrà fornito separatamente e dovrà essere integrato nel progetto.
+
+Notifiche automatiche
+Quando un giardiniere salva un lavoro, inviare all’amministratore:
+
+“Lavoro svolto dal giardiniere [NOME GIARDINIERE] per il cliente [NOME CLIENTE]: [DESCRIZIONE]. Note: [NOTE]. Data: [DATA ORA].”
+
+Questo messaggio deve:
+
+essere salvato in messaggi come tipo “automatico”
+
+generare una notifica push
+
+essere visibile nella pagina “Messaggi”
+
+Notifiche manuali
+Possibili direzioni:
+
+Giardiniere → Admin
+
+Cliente → Admin
+
+Admin → Giardiniere
+
+Admin → Cliente
+
+Ogni messaggio:
+
+viene salvato in messaggi
+
+può contenere foto
+
+genera una notifica push al destinatario
+
+💬 MESSAGGI — PAGINA AMMINISTRATORE
+Regole ufficiali messaggi:
+
+chat unica per ogni coppia di utenti:
+
+Admin ↔ Giardiniere
+
+Admin ↔ Cliente
+
+I messaggi automatici devono essere visibili e rispondibili.
+
+Ogni messaggio può contenere allegati multipli fino a un massimo di 5 foto.
+
+Storico messaggi illimitato.
+
+Ogni messaggio deve generare una notifica push al destinatario.
+
+UI stile WhatsApp.
+
+Nessun thread separato.
+
+Sicurezza: ogni utente vede solo la propria chat.
+
+Filtri:
+
+tipo messaggio (automatico/manuale)
+
+mittente ruolo
+
+destinatario ruolo
+
+giardiniere specifico
+
+cliente specifico
+
+data
+
+testo (ricerca full-text)
+
+Visualizzazione:
+
+elenco stile chat
+
+icone ruolo
+
+testo
+
+data
+
+foto (se presenti)
+
+pulsante “Rispondi”
+
+pulsante “Segna come letto”
+
+🔍 RICERCA LAVORI
+Ricerca full‑text su:
+
+descrizione lavoro
+
+note
+
+nome giardiniere
+
+nome cliente
+
+Filtri:
+
+data (oggi, ultimi 7 giorni, mese, intervallo)
+
+giardiniere
+
+cliente
+
+descrizione lavoro
+
+con/senza note
+
+Regole ufficiali ricerca:
+
+filtri combinabili con logica AND
+
+ordinamento predefinito per data decrescente
+
+paginazione: 20 risultati per pagina
+
+full-text su descrizione, note, nome giardiniere e nome cliente
+
+se non viene applicato alcun filtro, mostrare gli ultimi 30 lavori
+
+UX chiara e veloce
+
+Risultati:
+
+tabella ordinabile
+
+pulsante “Dettaglio”
+
+pulsante “PDF”
+
+Dettaglio lavoro:
+
+tutti i dati
+
+foto
+
+pulsante “Esporta PDF”
+
+pulsante “Invia messaggio”
+
+📄 PDF
+Esportazione PDF per:
+
+singolo lavoro
+
+lista filtrata
+
+mese
+
+cliente
+
+giardiniere
+
+descrizione lavoro
+
+Regole layout PDF:
+
+header con logo foglia, titolo, data e versione
+
+blocco informazioni con giardiniere, cliente, data, descrizione e note
+
+tabella lavori per PDF multipli
+
+foto impaginate 3 per riga
+
+footer con nome app, URL e numero pagina
+
+font Inter/Roboto
+
+tema verde
+
+margini 20mm
+
+nome file:
+
+lavoro_[cliente][data].pdf
+
+oppure
+
+report[periodo].pdf
+
+Generazione PDF lato serverless con pdf-lib o pdfkit.
+
+🌐 PWA — VERCEL
+Manifest.json
+
+Service Worker
+
+Icone PWA (foglia stilizzata)
+
+Installabile su Android
+
+Tema verde
+
+URL tipo: https://xxxxx.vercel.app
+
+🔄 VERSIONING AUTOMATICO
+Solo durante lo sviluppo e il deploy:
+
+commit automatico su GitHub
+
+push automatico
+
+deploy automatico su Vercel
+
+incremento versione:
+
+GeoGiardini v001
+
+GeoGiardini v002
+
+versione mostrata nella barra del titolo
+
+🧩 REGOLE DI SVILUPPO
+L’AI deve:
+
+generare tutti i file HTML, CSS e JS separati
+
+mantenere struttura modulare
+
+usare solo italiano
+
+tema verde/natura
+
+semplicità assoluta per i giardinieri
+
+integrare Dropbox, TURSO, notifiche, PDF, PWA
+
+gestire versioning automatico
+
+produrre documentazione finale
+
+📁 STRUTTURA PRINCIPALE DEL PROGETTO
+/public
+   manifest.json
+   service-worker.js
+   icon-192.png
+   icon-512.png
+
+/icons
+   (tutti i file SVG verranno inseriti nel BLOCCO 3)
+
+/css
+   global.css
+
+/js
+   api.js
+   notifiche.js
+   pdf.js
+   versioning.js
+   utils.js
+
+/api
+   /auth          → login, sessioni, logout, controlli accesso
+   /lavori         → CRUD lavori, ricerca, filtri, paginazione
+   /messaggi       → invio, lettura, cronologia, allegati, stato letto
+   /foto           → upload Dropbox, eliminazione, spazio disponibile
+   /pdf            → generazione PDF serverless
+   /notifiche      → invio notifiche push, gestione subscription
+   /admin          → CRUD giardinieri, clienti, descrizioni, assegnazioni
+
+/pages
+   /login
+   /admin
+   /giardiniere
+   /cliente
+📄 STRUTTURA DETTAGLIATA DELLE PAGINE
+Ogni pagina deve avere 3 file separati:
+
+.html
+
+.css
+
+.js
+
+🔐 Pagine Login
+/pages/login/
+   login_admin.html
+   login_admin.css
+   login_admin.js
+
+   login_giardiniere.html
+   login_giardiniere.css
+   login_giardiniere.js
+
+   login_cliente.html
+   login_cliente.css
+   login_cliente.js
+🧑‍💼 Pagine Amministratore
+/pages/admin/
+   admin_dashboard.html
+   admin_dashboard.css
+   admin_dashboard.js
+
+   gestione_giardinieri.html
+   gestione_giardinieri.css
+   gestione_giardinieri.js
+
+   gestione_clienti.html
+   gestione_clienti.css
+   gestione_clienti.js
+
+   gestione_descrizioni.html
+   gestione_descrizioni.css
+   gestione_descrizioni.js
+
+   assegnazioni.html
+   assegnazioni.css
+   assegnazioni.js
+
+   ricerca_lavori.html
+   ricerca_lavori.css
+   ricerca_lavori.js
+
+   gestione_foto.html
+   gestione_foto.css
+   gestione_foto.js
+
+   messaggi_admin.html
+   messaggi_admin.css
+   messaggi_admin.js
+👨‍🌾 Pagine Giardiniere
+/pages/giardiniere/
+   dashboard_giardiniere.html
+   dashboard_giardiniere.css
+   dashboard_giardiniere.js
+
+   inserisci_lavoro.html
+   inserisci_lavoro.css
+   inserisci_lavoro.js
+
+   messaggi_giardiniere.html
+   messaggi_giardiniere.css
+   messaggi_giardiniere.js
+🏡 Pagine Cliente
+/pages/cliente/
+   dashboard_cliente.html
+   dashboard_cliente.css
+   dashboard_cliente.js
+
+   report_cliente.html
+   report_cliente.css
+   report_cliente.js
+
+   messaggi_cliente.html
+   messaggi_cliente.css
+   messaggi_cliente.js
+🌿 MENU E NAVIGAZIONE — DEFINIZIONE UFFICIALE
+👨‍🌾 Menu Giardiniere (bottom bar)
+Sempre visibile in basso:
+
+🏠 Home  →  icons/home.svg
+📋 Inserisci Lavoro  →  icons/lavori.svg
+💬 Messaggi  →  icons/messaggi.svg
+Implementazione:
+
+barra fissa in basso
+
+icone SVG (dal BLOCCO 3)
+
+testo sotto icona
+
+evidenziare icona attiva
+
+🏡 Menu Cliente (bottom bar)
+🏠 Home  →  icons/home.svg
+📅 Report  →  icons/report.svg
+💬 Messaggi  →  icons/messaggi.svg
+Stesse regole del giardiniere.
+
+🧑‍💼 Menu Amministratore
+Bottom bar (solo funzioni principali)
+🏠 Dashboard  →  icons/home.svg
+💬 Messaggi  →  icons/messaggi.svg
+🔍 Ricerca  →  icons/ricerca.svg
+
+Menu laterale (hamburger)
+Botone apertura  →  icons/hamburger.svg
+A sinistra, scorrevole:
+
+Dashboard  →  icons/home.svg
+Gestione Giardinieri  →  icons/giardinieri.svg
+Gestione Clienti  →  icons/clienti.svg
+Descrizioni Lavoro  →  icons/descrizioni.svg
+Assegnazioni  →  icons/assegnazioni.svg
+Ricerca Lavori  →  icons/ricerca.svg
+Gestione Foto  →  icons/foto.svg
+Messaggi  →  icons/messaggi.svg
+Logout  →  icons/logout.svg
+🌐 STRUTTURA PWA
+/public/manifest.json
+/public/service-worker.js
+/public/icon-192.png  (generato da icons/pwa_leaf_192.svg)
+/public/icon-512.png  (generato da icons/pwa_leaf_512.svg)
+
+Nota: il manifest PWA richiede file PNG. Le icone SVG definite in BLOCCO 3
+devono essere convertite in PNG durante il build o fornite come PNG pronte.
+
+Regole:
+
+tema verde
+
+nome app: GeoGiardini
+
+icona: foglia stilizzata (arriva nel BLOCCO 3)
+
+offline caching
+
+installabile su Android
+
+🧩 STRUTTURA DEI FILE JS GLOBALI (LATO CLIENT)
+/js/api.js
+   → wrapper lato client per chiamare le API serverless
+
+/js/notifiche.js
+   → gestione lato client di permessi, registrazione e ricezione notifiche push
+
+/js/pdf.js
+   → helper lato client per richiedere l'esportazione PDF alle API serverless
+
+/js/versioning.js
+   → legge e mostra la versione corrente dell'app nella barra alta (v001, v002, ...)
+
+/js/utils.js
+   → funzioni comuni: formattazione date, loader, messaggi di errore, helpers UI
+🎨 STILE GRAFICO (GLOBAL.CSS)
+Regole obbligatorie:
+
+tema verde/natura
+
+font leggibile
+
+icone minimal lineari
+
+pulsanti grandi
+
+layout semplice
+
+contrasto alto per uso all’aperto
+
+responsive per smartphone
+
+BLOCCO 3 — TUTTE LE ICONE SVG (FILE VIRTUALI)
+Stile: Minimal Lineare — Stroke #1B5E20 — Stroke-width: 2 — Fill: none
+
+L’AI deve creare un file per ogni blocco.
+
+🌿 ICONE PWA (Foglia Stilizzata)
+=== FILE: icons/pwa_leaf_192.svg ===
+svg
+<svg width="192" height="192" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 2C7 5 4 10 4 14c0 4 3 7 8 7s8-3 8-7c0-4-3-9-8-12z"/>
+  <path d="M12 9v12"/>
+</svg>
+=== FILE: icons/pwa_leaf_512.svg ===
+svg
+<svg width="512" height="512" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 2C7 5 4 10 4 14c0 4 3 7 8 7s8-3 8-7c0-4-3-9-8-12z"/>
+  <path d="M12 9v12"/>
+</svg>
+🏠 ICONE MENU PRINCIPALI
+=== FILE: icons/home.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 9.5L12 3l9 6.5v10.5a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V9.5z"/>
+</svg>
+=== FILE: icons/lavori.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 17l6-6 4 4 8-8"/>
+  <circle cx="9" cy="9" r="2"/>
+</svg>
+=== FILE: icons/messaggi.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.38 8.38 0 0 1-3.3-.7L3 21l2-5.7A8.38 8.38 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/>
+</svg>
+=== FILE: icons/report.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3" width="18" height="18" rx="2"/>
+  <path d="M7 14l3-3 2 2 4-4"/>
+</svg>
+🧑‍💼 ICONE AMMINISTRATORE
+=== FILE: icons/giardinieri.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="7" r="4"/>
+  <path d="M4 21h16"/>
+  <path d="M6 21a6 6 0 0 1 12 0"/>
+</svg>
+=== FILE: icons/clienti.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 21v-8l9-6 9 6v8"/>
+  <path d="M9 21v-6h6v6"/>
+</svg>
+=== FILE: icons/descrizioni.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="4" width="16" height="16" rx="2"/>
+  <path d="M8 8h8M8 12h8M8 16h5"/>
+</svg>
+=== FILE: icons/assegnazioni.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="7" cy="7" r="3"/>
+  <circle cx="17" cy="17" r="3"/>
+  <path d="M10 10l4 4"/>
+</svg>
+=== FILE: icons/ricerca.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="11" cy="11" r="7"/>
+  <path d="M16 16l4 4"/>
+</svg>
+=== FILE: icons/foto.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3" width="18" height="18" rx="2"/>
+  <circle cx="8" cy="8" r="2"/>
+  <path d="M21 15l-5-5L5 21"/>
+</svg>
+=== FILE: icons/logout.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+  <path d="M16 17l5-5-5-5"/>
+  <path d="M21 12H9"/>
+</svg>
+🧰 ICONE FUNZIONALI (Modifica, Elimina, Aggiungi, PDF, Foto, ecc.)
+=== FILE: icons/add.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 5v14M5 12h14"/>
+</svg>
+=== FILE: icons/edit.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 20h9"/>
+  <path d="M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z"/>
+</svg>
+=== FILE: icons/delete.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="3 6 5 6 21 6"/>
+  <path d="M19 6l-1 14H6L5 6"/>
+  <path d="M10 11v6M14 11v6"/>
+</svg>
+=== FILE: icons/pdf.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+  <path d="M14 2v6h6"/>
+  <path d="M9 15h1.5a2 2 0 0 0 0-4H9v4zM9 13h1"/>
+  <path d="M14 11v4"/>
+  <path d="M14 13h2"/>
+</svg>
+=== FILE: icons/camera.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 7h4l2-3h6l2 3h4v12H3z"/>
+  <circle cx="12" cy="13" r="4"/>
+</svg>
+🧑‍🎨 ICONE RUOLI (Admin, Giardiniere, Cliente, Sistema)
+=== FILE: icons/ruolo_admin.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="7" r="4"/>
+  <path d="M4 21h16"/>
+  <path d="M6 21a6 6 0 0 1 12 0"/>
+</svg>
+=== FILE: icons/ruolo_giardiniere.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="7" r="4"/>
+  <path d="M5.5 21a6.5 6.5 0 0 1 13 0"/>
+  <path d="M3 12l4-2 2 4"/>
+</svg>
+=== FILE: icons/ruolo_cliente.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="7" r="4"/>
+  <path d="M5.5 21a6.5 6.5 0 0 1 13 0"/>
+  <path d="M3 12h18"/>
+</svg>
+=== FILE: icons/ruolo_sistema.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="9"/>
+  <path d="M12 7v5l3 3"/>
+</svg>
+🔔 ICONA NOTIFICHE
+=== FILE: icons/notifiche.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+</svg>
+
+☰ ICONA HAMBURGER (menu laterale admin)
+=== FILE: icons/hamburger.svg ===
+svg
+<svg viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 6h18"/>
+  <path d="M3 12h18"/>
+  <path d="M3 18h18"/>
+</svg>
+
+
+
+
+🌿 BLOCCO 5 — MOCKUP PAGINE E LAYOUT UFFICIALI
+Questo blocco definisce la struttura visiva delle pagine principali (login, dashboard, messaggi, ricerca, inserimento lavoro, gestione foto, report cliente) in modo che l’AI generi UI coerenti, moderne e responsive.
+
+5.1 — Pagine di login (admin, giardiniere, cliente)
+Login — regole comuni
+Sfondo pagina: #E8F5E9
+
+Contenuto centrato verticalmente e orizzontalmente
+
+Card centrale bianca, max-width 360px, radius 14px, shadow standard
+
+Logo foglia in alto, centrato
+
+Titolo sotto il logo
+
+Due campi input (username, codice)
+
+Bottone principale “Accedi” a tutta larghezza
+
+Testo piccolo sotto il bottone
+
+Layout mobile-first, identico per admin/giardiniere/cliente, cambia solo il titolo e il testo di supporto.
+
+LOGIN_ADMIN — layout ufficiale
+Struttura (mobile, tablet, desktop):
+
+In alto: logo foglia (icons/pwa_leaf_192.svg), centrato
+
+Sotto: titolo “Accesso Amministratore”
+
+Sotto: input “Username”
+
+Sotto: input “Codice”
+
+Sotto: bottone verde “Accedi”
+
+Sotto: testo piccolo “Accesso riservato all’amministratore.”
+
+In basso a destra, fuori dalla card: versione app (es. “GeoGiardini v001”)
+
+LOGIN_GIARDINIERE — layout ufficiale
+Stessa struttura della login admin, con:
+
+Titolo: “Accesso Giardiniere”
+
+Testo piccolo: “Inserisci le credenziali fornite dall’amministratore.”
+
+LOGIN_CLIENTE — layout ufficiale
+Stessa struttura, con:
+
+Titolo: “Accesso Cliente”
+
+Testo piccolo: “Accedi per vedere i lavori svolti nel tuo giardino.”
+
+5.2 — Dashboard amministratore
+Layout generale
+Header fisso in alto con:
+
+logo foglia a sinistra
+
+titolo “GeoGiardini — Amministratore”
+
+versione app a destra (es. v001)
+
+Sidebar sinistra (hamburger su mobile, fissa su desktop) con le voci:
+
+Dashboard
+
+Gestione Giardinieri
+
+Gestione Clienti
+
+Descrizioni Lavoro
+
+Assegnazioni
+
+Ricerca Lavori
+
+Gestione Foto
+
+Messaggi
+
+Logout
+
+Contenuto centrale: griglia di card statistiche.
+
+Contenuto dashboard admin
+Card (mobile: 1 per riga, desktop: 3 per riga):
+
+Giardinieri attivi
+
+icona giardinieri.svg
+
+numero grande
+
+Clienti totali
+
+icona clienti.svg
+
+numero grande
+
+Lavori ultimi 7 giorni
+
+icona lavori.svg
+
+numero grande
+
+Messaggi non letti
+
+icona messaggi.svg
+
+numero grande
+
+Spazio Dropbox usato
+
+icona foto.svg
+
+testo tipo “1.2 GB / 5 GB”
+
+5.3 — Dashboard giardiniere
+Header con titolo “GeoGiardini — Giardiniere”
+
+Bottom bar con:
+
+Home (attiva)
+
+Inserisci Lavoro
+
+Messaggi
+
+Contenuto:
+
+Card “Clienti assegnati” (numero)
+
+Card “Lavori inseriti questo mese”
+
+Pulsante grande “Inserisci nuovo lavoro” (porta a inserisci_lavoro.html)
+
+Lista ultimi 5 lavori con:
+
+nome cliente
+
+descrizione
+
+data
+
+5.4 — Dashboard cliente
+Header con titolo “GeoGiardini — Cliente”
+
+Bottom bar con:
+
+Home (attiva)
+
+Report
+
+Messaggi
+
+Contenuto:
+
+Card “Lavori questo mese”
+
+Card “Ultimo lavoro” (cliente vede data + descrizione)
+
+Pulsante “Apri report lavori” (porta a report_cliente.html)
+
+Lista ultimi lavori con:
+
+data
+
+descrizione
+
+icona pdf per esportare singolo lavoro
+
+5.5 — Pagina “Inserisci Lavoro” (giardiniere)
+Struttura:
+
+Header con titolo “Inserisci Lavoro”
+
+Card form con:
+
+Select cliente (solo clienti assegnati)
+
+Select descrizione lavoro
+
+Textarea note
+
+Sezione foto:
+
+pulsante “Aggiungi foto” (icona camera.svg)
+
+anteprime piccole delle foto selezionate
+
+Bottone principale “Salva lavoro”
+
+Regole UI:
+
+Dopo il salvataggio:
+
+mostra toast “Lavoro salvato con successo”
+
+invia messaggio automatico (come da specifiche)
+
+resetta il form
+
+5.6 — Pagina “Messaggi” (admin, giardiniere, cliente)
+Regole comuni:
+
+UI stile WhatsApp
+
+Header con:
+
+icona ruolo destinatario
+
+nome utente
+
+Lista messaggi in verticale:
+
+bolle verdi per messaggi inviati dall’utente corrente
+
+bolle bianche per messaggi ricevuti
+
+foto come miniature cliccabili
+
+timestamp piccolo in basso a destra nella bolla
+
+In basso, barra input fissa:
+
+campo testo
+
+pulsante allega foto (camera.svg)
+
+pulsante invia (icona messaggi.svg o freccia)
+
+Admin:
+
+pagina messaggi_admin.html deve mostrare:
+
+elenco conversazioni (a sinistra su desktop, a lista su mobile)
+
+quando selezioni una conversazione, si apre la chat a destra (desktop) o a schermo intero (mobile)
+
+5.7 — Pagina “Ricerca Lavori” (admin)
+Struttura:
+
+Header con titolo “Ricerca Lavori”
+
+Barra filtri in alto (in una card):
+
+Data (select: oggi, ultimi 7 giorni, mese, intervallo)
+
+Giardiniere (select)
+
+Cliente (select)
+
+Descrizione lavoro (select)
+
+Checkbox “Solo con note”
+
+Campo testo per ricerca full-text
+
+Sotto, tabella risultati:
+
+Colonne:
+
+Data
+
+Giardiniere
+
+Cliente
+
+Descrizione
+
+Note (icona se presenti)
+
+Azioni:
+
+pulsante “Dettaglio”
+
+pulsante “PDF” (icona pdf.svg)
+
+Paginazione in basso (20 per pagina).
+
+5.8 — Pagina “Gestione Foto” (admin)
+Struttura:
+
+Header “Gestione Foto”
+
+Card filtri:
+
+Data
+
+Giardiniere
+
+Cliente
+
+Lavoro / Messaggio
+
+Sotto, griglia di foto (3 per riga su desktop, 2 su tablet, 1 su mobile):
+
+Ogni foto:
+
+miniatura
+
+info: data, giardiniere, cliente
+
+checkbox per selezione multipla
+
+In alto a destra:
+
+pulsante “Elimina selezionate” (icona delete.svg)
+
+In alto a sinistra:
+
+indicatore spazio Dropbox usato (es. “1.2 GB / 5 GB”)
+
+5.9 — Pagina “Report Cliente”
+Struttura:
+
+Header “Report lavori”
+
+Card filtri:
+
+Mese / intervallo date
+
+Sotto, lista lavori in card:
+
+Ogni card:
+
+data
+
+descrizione
+
+note (se presenti)
+
+pulsante “PDF lavoro”
+
+In alto:
+
+pulsante “PDF riepilogo periodo” (icona pdf.svg)
+
+5.10 — Regole di navigazione tra pagine
+Dopo login admin → admin_dashboard.html
+
+Dopo login giardiniere → dashboard_giardiniere.html
+
+Dopo login cliente → dashboard_cliente.html
+
+Bottom bar giardiniere:
+
+Home → dashboard_giardiniere.html
+
+Inserisci Lavoro → inserisci_lavoro.html
+
+Messaggi → messaggi_giardiniere.html
+
+Bottom bar cliente:
+
+Home → dashboard_cliente.html
+
+Report → report_cliente.html
+
+Messaggi → messaggi_cliente.html
+
+Admin:
+
+Dashboard → admin_dashboard.html
+
+Gestione Giardinieri → gestione_giardinieri.html
+
+Gestione Clienti → gestione_clienti.html
+
+Descrizioni → gestione_descrizioni.html
+
+Assegnazioni → assegnazioni.html
+
+Ricerca Lavori → ricerca_lavori.html
+
+Gestione Foto → gestione_foto.html
+
+Messaggi → messaggi_admin.html
+
+🎨 PALETTE COLORI
+Tema: Verde/Natura
+
+Colori principali:
+- Verde scuro: #2E7D32
+- Verde chiaro: #81C784
+- Bianco: #FFFFFF
+- Grigio chiaro: #F5F5F5
+- Nero: #000000
+
+Utilizzo:
+- **Verde scuro**: Header, footer, pulsanti principali.
+- **Verde chiaro**: Sfondo di sezioni, hover su pulsanti.
+- **Bianco**: Sfondo principale, testi su sfondi scuri.
+- **Grigio chiaro**: Bordo, sfondo di input e tabelle.
+- **Nero**: Testi principali.

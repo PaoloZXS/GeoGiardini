@@ -96,12 +96,25 @@
         display: grid;
         gap: 1rem;
         align-items: center;
+        justify-items: center;
         background: linear-gradient(
           180deg,
           rgba(129, 199, 132, 0),
           rgba(46, 125, 50, 0.04)
         );
         padding-bottom: 0.75rem;
+      }
+      .footer-icon {
+        width: 58px;
+        height: 58px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .footer-icon img {
+        width: 100%;
+        height: auto;
+        display: block;
       }
       .dashboard-separator {
         height: 1px;
@@ -277,6 +290,9 @@
         </div>
       </div>
       <div class="dashboard-footer">
+        <div class="footer-icon">
+          <img src="/icons/leaf-512.png" alt="Icona Foglia" />
+        </div>
         <button class="logout-bottom" id="logoutLink">Logout</button>
         <div class="dashboard-separator"></div>
         <p class="footer-note">Powered Spectrum Italia 2026</p>

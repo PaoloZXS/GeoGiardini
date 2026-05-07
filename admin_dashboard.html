@@ -4,7 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#2e7d32" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="GeoGiardini" />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/leaf-192.png" />
     <title>Admin Dashboard - GeoGiardini</title>
     <link rel="icon" type="image/png" href="/icons/logo.png" />
     <style>
@@ -117,7 +124,7 @@
           <div class="version-label" id="versionLabel">v009</div>
         </div>
         <div class="actions">
-          <a href="/login.html">Logout</a>
+          <a href="#" id="logoutLink">Logout</a>
         </div>
       </div>
       <div class="welcome-card">
@@ -171,6 +178,16 @@
       }
       fetchVersion();
 
+      function initPage() {
+        const logoutLink = document.getElementById("logoutLink");
+        if (logoutLink) {
+          logoutLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            window.location.replace("/login.html");
+          });
+        }
+      }
+
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
@@ -180,6 +197,7 @@
             });
         });
       }
+      initPage();
     </script>
   </body>
 </html>

@@ -381,6 +381,8 @@
           if (response.ok) {
             const result = await response.json();
             if (result.success) {
+              localStorage.setItem("geogiardini_username", username);
+              localStorage.setItem("geogiardini_role", result.role);
               if (result.role === "admin") {
                 window.location.replace("/admin_dashboard.html");
               } else {

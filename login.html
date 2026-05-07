@@ -382,9 +382,9 @@
             const result = await response.json();
             if (result.success) {
               if (result.role === "admin") {
-                window.location.href = "/admin_dashboard.html";
+                window.location.replace("/admin_dashboard.html");
               } else {
-                window.location.href = "/dashboard.html";
+                window.location.replace("/dashboard.html");
               }
             } else {
               document.getElementById("errorMessage").style.display = "block";

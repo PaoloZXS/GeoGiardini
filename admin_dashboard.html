@@ -42,21 +42,27 @@
         flex-direction: column;
       }
       .top-block,
+      .content-block,
       .leaf-block,
       .footer-block {
         width: 100%;
       }
-      .leaf-block {
+      .content-block {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: auto;
+        gap: 1rem;
+      }
+      .leaf-block {
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 1rem 0;
         min-height: 0;
-        overflow: auto;
       }
       .footer-block {
-        margin-top: auto;
         padding-bottom: 0.5rem;
       }
       .top-bar {
@@ -292,50 +298,54 @@
   </head>
   <body>
     <div class="page">
-      <div class="top-block">
-        <div class="top-bar">
-          <div>
-            <h1 class="dashboard-title">
-              <span id="dashboardTitleText">Pannello Amministratore</span>
-            </h1>
+      <div class="content-block">
+        <div class="top-block">
+          <div class="top-bar">
+            <div>
+              <h1 class="dashboard-title">
+                <span id="dashboardTitleText">Pannello Amministratore</span>
+              </h1>
+            </div>
+          </div>
+          <div class="diamond-grid">
+            <div class="diamond-card">
+              <div class="diamond-content">
+                <div class="diamond-icon">👩‍🌾</div>
+                <h3>Giardinieri</h3>
+              </div>
+            </div>
+            <div class="diamond-card">
+              <div class="diamond-content">
+                <div class="diamond-icon">👥</div>
+                <h3>Clienti</h3>
+              </div>
+            </div>
+            <div class="diamond-card">
+              <div class="diamond-content">
+                <div class="diamond-icon">🛠️</div>
+                <h3>Lavori</h3>
+              </div>
+            </div>
+            <div class="diamond-card">
+              <div class="diamond-content">
+                <div class="diamond-icon">💬</div>
+                <h3>Messaggi</h3>
+              </div>
+            </div>
+            <div class="diamond-card">
+              <div class="diamond-content">
+                <div class="diamond-icon">📸</div>
+                <h3>Foto</h3>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="diamond-grid">
-          <div class="diamond-card">
-            <div class="diamond-content">
-              <div class="diamond-icon">👩‍🌾</div>
-              <h3>Giardinieri</h3>
+        <div>
+          <div class="leaf-block">
+            <div class="footer-icon">
+              <img src="/icons/leaf-512.png" alt="Icona Foglia" />
             </div>
           </div>
-          <div class="diamond-card">
-            <div class="diamond-content">
-              <div class="diamond-icon">👥</div>
-              <h3>Clienti</h3>
-            </div>
-          </div>
-          <div class="diamond-card">
-            <div class="diamond-content">
-              <div class="diamond-icon">🛠️</div>
-              <h3>Lavori</h3>
-            </div>
-          </div>
-          <div class="diamond-card">
-            <div class="diamond-content">
-              <div class="diamond-icon">💬</div>
-              <h3>Messaggi</h3>
-            </div>
-          </div>
-          <div class="diamond-card">
-            <div class="diamond-content">
-              <div class="diamond-icon">📸</div>
-              <h3>Foto</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="leaf-block">
-        <div class="footer-icon">
-          <img src="/icons/leaf-512.png" alt="Icona Foglia" />
         </div>
       </div>
       <div class="footer-block">

@@ -341,7 +341,7 @@
           <button class="logout-bottom" id="logoutLink">Logout</button>
           <div class="dashboard-separator"></div>
           <p class="footer-note">Powered Spectrum Italia 2026</p>
-          <p class="app-version">Versione v071</p>
+          <p class="app-version" id="appVersion">Versione in caricamento...</p>
         </div>
       </div>
     </div>
@@ -371,6 +371,21 @@
         }
       }
 
+      async function fetchAppVersion() {
+        const versionLabel = document.getElementById("appVersion");
+        if (!versionLabel) return;
+
+        try {
+          const response = await fetch(`/version.txt?cacheBust=${Date.now()}`);
+          if (!response.ok) throw new Error("Version file not found");
+          const version = (await response.text()).trim();
+          versionLabel.textContent = `Versione ${version}`;
+        } catch (error) {
+          console.error("Errore nel recupero della versione:", error);
+          versionLabel.textContent = "Versione non disponibile";
+        }
+      }
+
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
@@ -381,6 +396,7 @@
         });
       }
       setDashboardGreeting();
+      fetchAppVersion();
       initPage();
     </script>
   </body>

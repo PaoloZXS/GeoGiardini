@@ -28,6 +28,7 @@
       body {
         height: 100%;
         margin: 0;
+        overflow: hidden;
       }
       body {
         background: linear-gradient(180deg, #81c784 0%, #2e7d32 100%);
@@ -37,7 +38,7 @@
         max-width: 1100px;
         margin: 0 auto;
         padding: 1rem 0.85rem 0;
-        min-height: 100vh;
+        height: 100vh;
         display: flex;
         flex-direction: column;
       }
@@ -48,11 +49,11 @@
         width: 100%;
       }
       .content-block {
-        flex: 1;
+        flex: 1 1 auto;
         display: flex;
         flex-direction: column;
         min-height: 0;
-        overflow: auto;
+        overflow-y: auto;
         gap: 1rem;
       }
       .leaf-block {
@@ -63,6 +64,7 @@
         min-height: 0;
       }
       .footer-block {
+        flex-shrink: 0;
         padding-bottom: 0.5rem;
       }
       .top-bar {

@@ -90,8 +90,7 @@
       }
       .dashboard-footer {
         margin-top: auto;
-        position: sticky;
-        bottom: 1cm;
+        position: relative;
         padding: 1rem 1rem 1rem;
         display: flex;
         flex-direction: column;
@@ -105,6 +104,10 @@
         );
       }
       .footer-icon {
+        position: absolute;
+        top: -3.25rem;
+        left: 50%;
+        transform: translateX(-50%);
         width: 120px;
         height: 120px;
         display: flex;

@@ -157,7 +157,8 @@
 .auth-field__label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #000000;
+  color: #ffffff;
+  margin-left: 0.75rem;
 }
 
 .auth-field__input-wrapper {
@@ -193,6 +194,7 @@
 .login-page__actions {
   display: grid;
   gap: 1rem;
+  margin-top: 4.5rem;
 }
 
 .login-page__link {

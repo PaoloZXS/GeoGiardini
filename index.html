@@ -6,6 +6,9 @@
     <meta name="theme-color" content="#0f172a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <link rel="apple-touch-icon" href="/leaf-512.png" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -104,10 +107,31 @@
         }
       };
     </script>
-    <title>GeoGiardini</title>
+    <title>GeoLogin</title>
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && 'serviceWorker' in navigator && !sessionStorage.getItem('sw-unregistered')) {
+        navigator.serviceWorker.getRegistrations().then(function (registrations) {
+          if (registrations.length > 0) {
+            Promise.all(registrations.map(function (reg) {
+              return reg.unregister();
+            })).then(function () {
+              sessionStorage.setItem('sw-unregistered', '1');
+              window.location.reload();
+            });
+          }
+        });
+      }
+      if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.caches) {
+        caches.keys().then(function (cacheNames) {
+          cacheNames.forEach(function (cacheName) {
+            caches.delete(cacheName);
+          });
+        });
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

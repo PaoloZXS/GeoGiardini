@@ -1,0 +1,25 @@
+import { useNavigate } from 'react-router-dom';
+
+function GiardinierePage() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="bg-background text-on-surface h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-xl rounded-[32px] border border-outline-variant bg-surface-container-low p-8 shadow-2xl text-center">
+        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">Giardiniere</h1>
+        <p className="font-body-md text-on-surface-variant mb-6">
+          Sei entrato con le credenziali giardiniere. Questa pagina è un placeholder che possiamo ampliare subito.
+        </p>
+        <button
+          type="button"
+          onClick={() => navigate('/geologin', { replace: true })}
+          className="inline-flex h-11 px-5 items-center justify-center rounded-full bg-primary text-on-primary font-bold transition hover:bg-primary/90"
+        >
+          Torna al login
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default GiardinierePage;

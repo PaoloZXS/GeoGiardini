@@ -3,11 +3,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthField from '../components/AuthField';
 
 type LoginPageProps = {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (role: 'admin' | 'cliente' | 'giardiniere') => void;
 };
+
+type UserRole = 'admin' | 'cliente' | 'giardiniere';
 
 function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const navigate = useNavigate();
+  const [loginRole, setLoginRole] = useState<UserRole>(() => {
+    if (typeof window === 'undefined') return 'admin';
+    const stored = window.localStorage.getItem('loginRole');
+    return stored === 'cliente' || stored === 'giardiniere' || stored === 'admin' ? stored : 'admin';
+  });
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,6 +25,12 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
     setPassword('');
     setError('');
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('loginRole', loginRole);
+    }
+  }, [loginRole]);
 
   useEffect(() => {
     if (!error) {
@@ -40,16 +53,59 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
     };
   }, [error]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (username === 'Angelo' && password === 'A2026') {
-      onLoginSuccess();
-      navigate('/admin');
+
+    if (loginRole === 'admin') {
+      if (username === 'Angelo' && password === 'A2026') {
+        onLoginSuccess('admin');
+        navigate('/admin');
+        return;
+      }
+      setError('Credenziali admin errate. Riprovare');
       return;
     }
 
-    setError('Credenziali errate. Riprovare');
+    if (!username.trim() || !password.trim()) {
+      setError('Inserisci nome e codice.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: loginRole,
+          username: username.trim(),
+          code: password.trim(),
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        setError(result.message || 'Credenziali errate. Riprovare');
+        return;
+      }
+
+      onLoginSuccess(loginRole);
+      if (loginRole === 'cliente') {
+        navigate('/cliente');
+      } else {
+        navigate('/giardiniere');
+      }
+    } catch (error) {
+      console.error(error);
+      setError('Errore di rete durante il login. Riprova.');
+    }
   };
+
+  const isAdmin = loginRole === 'admin';
+  const firstLabel = loginRole === 'admin' ? 'Admin' : loginRole === 'cliente' ? 'Nome Cliente' : 'Nome Giardiniere';
+  const firstPlaceholder = loginRole === 'admin' ? 'Inserisci Admin' : loginRole === 'cliente' ? 'Inserisci Nome Cliente' : 'Inserisci Nome Giardiniere';
+  const secondLabel = isAdmin ? 'Password' : 'Codice';
+  const secondPlaceholder = isAdmin ? '••••••••' : 'Inserisci il codice';
+  const secondType = isAdmin ? 'password' : 'text';
 
   return (
     <div className="login-page">
@@ -71,11 +127,33 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
         </div>
 
         <form className="login-page__form" autoComplete="off" onSubmit={handleSubmit}>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            {(['admin', 'cliente', 'giardiniere'] as UserRole[]).map((role) => (
+              <button
+                key={role}
+                type="button"
+                className={`h-11 flex-1 rounded-full border px-4 text-sm font-bold transition ${
+                  loginRole === role
+                    ? 'border-primary bg-primary text-on-primary'
+                    : 'border-outline-variant bg-surface text-on-surface hover:bg-surface-container-high'
+                }`}
+                onClick={() => {
+                  setLoginRole(role);
+                  setUsername('');
+                  setPassword('');
+                  setError('');
+                }}
+              >
+                {role === 'admin' ? 'Admin' : role === 'cliente' ? 'Cliente' : 'Giardiniere'}
+              </button>
+            ))}
+          </div>
+
           <AuthField
             id="username"
-            label="Nome utente"
+            label={firstLabel}
             type="text"
-            placeholder="Inserisci il nome utente"
+            placeholder={firstPlaceholder}
             icon="person"
             value={username}
             onChange={(value) => setUsername(value)}
@@ -83,19 +161,16 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
           />
           <AuthField
             id="password"
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            icon="lock"
+            label={secondLabel}
+            type={secondType}
+            placeholder={secondPlaceholder}
+            icon={isAdmin ? 'lock' : 'key'}
             value={password}
             onChange={(value) => setPassword(value)}
-            autoComplete="new-password"
+            autoComplete={isAdmin ? 'new-password' : 'off'}
           />
 
           <div className="login-page__actions">
-            <Link className="login-page__link" to="#">
-              Password dimenticata
-            </Link>
             <button className="login-page__submit" type="submit">
               Accedi
             </button>
@@ -109,13 +184,7 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
         </div>
       )}
 
-      <footer className="login-page__footer">
-        <p>
-          Nuovo utente?{' '}
-          <Link className="login-page__footer-link" to="#">
-            Registrati adesso
-          </Link>
-        </p>
+      <footer className="login-page__footer" style={{ marginTop: '3rem' }}>
         <p className="login-page__powered-by">Powered by Spectrum Italia 2026</p>
       </footer>
 

@@ -8,46 +8,60 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { username, code } = req.body;
+  const { role, username, code } = req.body ?? {};
 
-  if (!username || !code) {
-    return res.status(400).json({ error: "Missing username or code" });
+  if (!['admin', 'giardiniere', 'cliente'].includes(role)) {
+    return res.status(400).json({ success: false, message: 'Ruolo di login non valido.' });
   }
 
-  if (username === "Angelo" && code === "A2026") {
-    return res.status(200).json({ success: true, role: "admin", username });
+  if (!username || !code) {
+    return res.status(400).json({ success: false, message: 'Nome e codice sono obbligatori.' });
+  }
+
+  if (role === 'admin') {
+    if (username === 'Angelo' && code === 'A2026') {
+      return res.status(200).json({ success: true, role: 'admin', username });
+    }
+    return res.status(401).json({ success: false, message: 'Credenziali admin errate.' });
   }
 
   try {
+    const sql =
+      role === 'giardiniere'
+        ? 'SELECT id FROM giardinieri WHERE username = ? AND codice = ? LIMIT 1'
+        : 'SELECT id FROM clienti WHERE LOWER(nome) = LOWER(?) AND codice = ? LIMIT 1';
+    const parameters = [username, code];
+
     const response = await fetch(`${TURSO_DATABASE_URL}/execute`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${TURSO_AUTH_TOKEN}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${TURSO_AUTH_TOKEN}`,
       },
       body: JSON.stringify({
         statements: [
           {
-            sql: "SELECT * FROM giardinieri WHERE username = ? AND codice = ?",
-            parameters: [username, code]
-          }
-        ]
-      })
+            sql,
+            parameters,
+          },
+        ],
+      }),
     });
 
     if (!response.ok) {
-      throw new Error("Database query failed");
+      throw new Error('Database query failed');
     }
 
     const data = await response.json();
+    const results = data.results?.[0]?.rows ?? [];
 
-    if (data.results && data.results.length > 0) {
-      res.status(200).json({ success: true });
-    } else {
-      res.status(401).json({ success: false });
+    if (Array.isArray(results) && results.length > 0) {
+      return res.status(200).json({ success: true, role, username });
     }
+
+    return res.status(401).json({ success: false, message: 'Credenziali errate.' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ success: false, message: 'Errore interno del server.' });
   }
 }

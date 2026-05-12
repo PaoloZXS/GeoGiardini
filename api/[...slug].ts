@@ -26,7 +26,7 @@ async function ensureGiardinieriTable(db: ReturnType<typeof createDbClient>) {
 
   if (!hasGiardinieri) {
     await db.execute(
-      'CREATE TABLE giardinieri (id TEXT PRIMARY KEY, username TEXT NOT NULL, codice TEXT NOT NULL, created_at TEXT NOT NULL)',
+      'CREATE TABLE giardinieri (id TEXT PRIMARY KEY, username TEXT NOT NULL, codice TEXT NOT NULL, created_at TEXT NOT NULL, attivo INTEGER NOT NULL DEFAULT 0)',
       []
     );
     if (hasFix) {
@@ -42,7 +42,7 @@ async function ensureGiardinieriTable(db: ReturnType<typeof createDbClient>) {
   if (hasFix) {
     const tempTable = 'giardinieri_migration';
     await db.execute(
-      `CREATE TABLE IF NOT EXISTS ${tempTable} (id TEXT PRIMARY KEY, username TEXT NOT NULL, codice TEXT NOT NULL, created_at TEXT NOT NULL)`,
+      `CREATE TABLE IF NOT EXISTS ${tempTable} (id TEXT PRIMARY KEY, username TEXT NOT NULL, codice TEXT NOT NULL, created_at TEXT NOT NULL, attivo INTEGER NOT NULL DEFAULT 0)`,
       []
     );
     await db.execute(
@@ -57,13 +57,37 @@ async function ensureGiardinieriTable(db: ReturnType<typeof createDbClient>) {
     await db.execute('DROP TABLE IF EXISTS giardinieri', []);
     await db.execute(`ALTER TABLE ${tempTable} RENAME TO giardinieri`, []);
   }
+
+  const columnsResult = await db.execute("PRAGMA table_info('giardinieri')", []);
+  const columns = Array.isArray(columnsResult.rows)
+    ? columnsResult.rows.map((row: any) => row?.name?.toString() ?? row?.[1]?.toString() ?? Object.values(row)[1]?.toString())
+    : [];
+
+  if (!columns.includes('attivo')) {
+    await db.execute('ALTER TABLE giardinieri ADD COLUMN attivo INTEGER NOT NULL DEFAULT 0', []);
+  }
 }
 
 async function ensureClientiTable(db: ReturnType<typeof createDbClient>) {
   await db.execute(
-    'CREATE TABLE IF NOT EXISTS clienti (id INTEGER PRIMARY KEY, nome TEXT, indirizzo TEXT, telefono TEXT)',
+    'CREATE TABLE IF NOT EXISTS clienti (id INTEGER PRIMARY KEY, nome TEXT, indirizzo TEXT, telefono TEXT, codice TEXT NOT NULL DEFAULT "", attivo INTEGER NOT NULL DEFAULT 1)',
     []
   );
+
+  const columnsResult = await db.execute("PRAGMA table_info('clienti')", []);
+  const columns = Array.isArray(columnsResult.rows)
+    ? columnsResult.rows.map((row: any) =>
+        row?.name?.toString() ?? row?.[1]?.toString() ?? Object.values(row)[1]?.toString()
+      )
+    : [];
+
+  if (!columns.includes('codice')) {
+    await db.execute('ALTER TABLE clienti ADD COLUMN codice TEXT NOT NULL DEFAULT ""', []);
+  }
+
+  if (!columns.includes('attivo')) {
+    await db.execute('ALTER TABLE clienti ADD COLUMN attivo INTEGER NOT NULL DEFAULT 1', []);
+  }
 }
 
 function extractCount(result: any) {
@@ -108,9 +132,10 @@ export default async function handler(req: any, res: any) {
 
   try {
     if (path === 'giardinieri' && method === 'POST') {
-      const { username, codice } = req.body ?? {};
+      const { username, codice, attivo } = req.body ?? {};
       const trimmedUsername = username?.toString().trim();
       const trimmedCodice = codice?.toString().trim();
+      const isActive = attivo ? 1 : 0;
 
       if (!trimmedUsername || !trimmedCodice) {
         return res.status(400).json({ success: false, message: 'Username e codice sono obbligatori.' });
@@ -128,8 +153,8 @@ export default async function handler(req: any, res: any) {
       }
 
       await db.execute(
-        `INSERT INTO ${tableName} (id, username, codice, created_at) VALUES (?, ?, ?, ?)`,
-        [crypto.randomUUID(), trimmedUsername, trimmedCodice, new Date().toISOString()]
+        `INSERT INTO ${tableName} (id, username, codice, created_at, attivo) VALUES (?, ?, ?, ?, ?)`,
+        [crypto.randomUUID(), trimmedUsername, trimmedCodice, new Date().toISOString(), isActive]
       );
 
       return res.json({ success: true });
@@ -137,15 +162,16 @@ export default async function handler(req: any, res: any) {
 
     if (path === 'giardinieri' && method === 'GET') {
       await ensureGiardinieriTable(db);
-      const result = await db.execute('SELECT id, username, codice, created_at FROM giardinieri ORDER BY created_at DESC', []);
+      const result = await db.execute('SELECT id, username, codice, created_at, attivo FROM giardinieri ORDER BY created_at DESC', []);
       return res.json({ success: true, giardinieri: result.rows || [] });
     }
 
     if (path.startsWith('giardinieri/') && method === 'PUT') {
       const id = slug[1];
-      const { username, codice } = req.body ?? {};
+      const { username, codice, attivo } = req.body ?? {};
       const trimmedUsername = username?.toString().trim();
       const trimmedCodice = codice?.toString().trim();
+      const isActive = attivo ? 1 : 0;
 
       if (!trimmedUsername || !trimmedCodice) {
         return res.status(400).json({ success: false, message: 'Username e codice sono obbligatori.' });
@@ -163,21 +189,23 @@ export default async function handler(req: any, res: any) {
       }
 
       await db.execute(
-        `UPDATE ${tableName} SET username = ?, codice = ? WHERE id = ?`,
-        [trimmedUsername, trimmedCodice, id]
+        `UPDATE ${tableName} SET username = ?, codice = ?, attivo = ? WHERE id = ?`,
+        [trimmedUsername, trimmedCodice, isActive, id]
       );
 
       return res.json({ success: true });
     }
 
     if (path === 'clienti' && method === 'POST') {
-      const { nome, indirizzo, telefono } = req.body ?? {};
+      const { nome, indirizzo, telefono, codice, attivo } = req.body ?? {};
       const trimmedNome = nome?.toString().trim();
       const trimmedIndirizzo = indirizzo?.toString().trim();
       const trimmedTelefono = telefono?.toString().trim() ?? '';
+      const trimmedCodice = codice?.toString().trim();
+      const isActive = attivo ? 1 : 0;
 
-      if (!trimmedNome || !trimmedIndirizzo) {
-        return res.status(400).json({ success: false, message: 'Nome e indirizzo sono obbligatori.' });
+      if (!trimmedNome || !trimmedIndirizzo || !trimmedCodice) {
+        return res.status(400).json({ success: false, message: 'Nome, indirizzo e codice sono obbligatori.' });
       }
 
       await ensureClientiTable(db);
@@ -187,25 +215,27 @@ export default async function handler(req: any, res: any) {
         return res.status(409).json({ success: false, message: 'Cliente già presente. Usa un altro nome.' });
       }
 
-      await db.execute('INSERT INTO clienti (nome, indirizzo, telefono) VALUES (?, ?, ?)', [trimmedNome, trimmedIndirizzo, trimmedTelefono]);
+      await db.execute('INSERT INTO clienti (nome, indirizzo, telefono, codice, attivo) VALUES (?, ?, ?, ?, ?)', [trimmedNome, trimmedIndirizzo, trimmedTelefono, trimmedCodice, isActive]);
       return res.json({ success: true });
     }
 
     if (path === 'clienti' && method === 'GET') {
       await ensureClientiTable(db);
-      const result = await db.execute('SELECT id, nome, indirizzo, telefono FROM clienti ORDER BY id DESC', []);
+      const result = await db.execute('SELECT id, nome, indirizzo, telefono, codice, attivo FROM clienti ORDER BY id DESC', []);
       return res.json({ success: true, clienti: result.rows || [] });
     }
 
     if (path.startsWith('clienti/') && method === 'PUT') {
       const id = slug[1];
-      const { nome, indirizzo, telefono } = req.body ?? {};
+      const { nome, indirizzo, telefono, codice, attivo } = req.body ?? {};
       const trimmedNome = nome?.toString().trim();
       const trimmedIndirizzo = indirizzo?.toString().trim();
       const trimmedTelefono = telefono?.toString().trim() ?? '';
+      const trimmedCodice = codice?.toString().trim();
+      const isActive = attivo ? 1 : 0;
 
-      if (!trimmedNome || !trimmedIndirizzo) {
-        return res.status(400).json({ success: false, message: 'Nome e indirizzo sono obbligatori.' });
+      if (!trimmedNome || !trimmedIndirizzo || !trimmedCodice) {
+        return res.status(400).json({ success: false, message: 'Nome, indirizzo e codice sono obbligatori.' });
       }
 
       await ensureClientiTable(db);
@@ -215,21 +245,29 @@ export default async function handler(req: any, res: any) {
         return res.status(409).json({ success: false, message: 'Cliente già presente. Usa un altro nome.' });
       }
 
-      await db.execute('UPDATE clienti SET nome = ?, indirizzo = ?, telefono = ? WHERE id = ?', [trimmedNome, trimmedIndirizzo, trimmedTelefono, id]);
+      await db.execute('UPDATE clienti SET nome = ?, indirizzo = ?, telefono = ?, codice = ?, attivo = ? WHERE id = ?', [trimmedNome, trimmedIndirizzo, trimmedTelefono, trimmedCodice, isActive, id]);
       return res.json({ success: true });
     }
 
     if (path === 'counts' && method === 'GET') {
       await ensureGiardinieriTable(db);
       await ensureClientiTable(db);
-      const [giardResult, clientResult] = await Promise.all([
+      const [giardResult, clientResult, giardActiveResult, giardInactiveResult, activeResult, inactiveResult] = await Promise.all([
         db.execute('SELECT COUNT(*) FROM giardinieri', []),
         db.execute('SELECT COUNT(*) FROM clienti', []),
+        db.execute('SELECT COUNT(*) FROM giardinieri WHERE attivo = 1', []),
+        db.execute('SELECT COUNT(*) FROM giardinieri WHERE attivo = 0', []),
+        db.execute('SELECT COUNT(*) FROM clienti WHERE attivo = 1', []),
+        db.execute('SELECT COUNT(*) FROM clienti WHERE attivo = 0', []),
       ]);
       return res.json({
         success: true,
         giardinieriCount: extractCount(giardResult),
+        giardinieriActiveCount: extractCount(giardActiveResult),
+        giardinieriInactiveCount: extractCount(giardInactiveResult),
         clientiCount: extractCount(clientResult),
+        clientiActiveCount: extractCount(activeResult),
+        clientiInactiveCount: extractCount(inactiveResult),
       });
     }
 

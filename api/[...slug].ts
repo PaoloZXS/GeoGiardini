@@ -90,8 +90,16 @@ export default async function handler(req: any, res: any) {
       ? req.query.path
       : [req.query.path]
     : [];
-  const rawSlug = rawUrl.startsWith('/api/')
-    ? rawUrl.replace(/^\/api\//, '').replace(/\?.*$/, '').split('/').filter(Boolean)
+  const normalizedUrl = (() => {
+    try {
+      const url = new URL(rawUrl, 'http://example.com');
+      return url.pathname + url.search;
+    } catch {
+      return rawUrl;
+    }
+  })();
+  const rawSlug = normalizedUrl.includes('/api/')
+    ? normalizedUrl.replace(/^.*\/api\//, '').replace(/\?.*$/, '').split('/').filter(Boolean)
     : [];
   const slug = rawSlug.length >= querySlug.length ? rawSlug : querySlug;
   const path = slug.join('/');

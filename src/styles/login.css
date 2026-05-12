@@ -1,0 +1,413 @@
+:root {
+  color-scheme: dark;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #191c1b;
+  background: #f8faf8;
+  --surface: #f8faf8;
+  --surface-dim: #d8dad9;
+  --surface-bright: #f8faf8;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f2f4f2;
+  --surface-container: #eceeec;
+  --surface-container-high: #e6e9e7;
+  --surface-container-highest: #e1e3e1;
+  --on-surface: #191c1b;
+  --on-surface-variant: #42493e;
+  --inverse-surface: #2e3130;
+  --inverse-on-surface: #eff1ef;
+  --outline: #72796e;
+  --outline-variant: #c2c9bb;
+  --surface-tint: #3b6934;
+  --primary: #154212;
+  --on-primary: #ffffff;
+  --primary-container: #2d5a27;
+  --on-primary-container: #9dd090;
+  --inverse-primary: #a1d494;
+  --secondary: #4a6549;
+  --on-secondary: #ffffff;
+  --secondary-container: #ccebc7;
+  --on-secondary-container: #506b4f;
+  --tertiary: #00440e;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #005e17;
+  --on-tertiary-container: #75d974;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+  --primary-fixed: #bcf0ae;
+  --primary-fixed-dim: #a1d494;
+  --on-primary-fixed: #002201;
+  --on-primary-fixed-variant: #23501e;
+  --secondary-fixed: #ccebc7;
+  --secondary-fixed-dim: #b0cfad;
+  --on-secondary-fixed: #07200b;
+  --on-secondary-fixed-variant: #334d33;
+  --tertiary-fixed: #94f990;
+  --tertiary-fixed-dim: #78dc77;
+  --on-tertiary-fixed: #002204;
+  --on-tertiary-fixed-variant: #005313;
+  --background: #f8faf8;
+  --on-background: #191c1b;
+  --surface-variant: #e1e3e1;
+  --text-regular: #191c1b;
+  --text-muted: #42493e;
+  --shadow: 0 25px 80px rgba(20, 64, 18, 0.14);
+  --page-background: url('/images/sfondo1.jpg');
+}
+
+.admin-page-root,
+.login-page {
+  background-color: #2FA04C;
+  background-image: var(--page-background, none);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.login-page {
+  min-height: 100vh;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-regular);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-page__top {
+  padding: 2rem 1.25rem 0;
+  text-align: center;
+}
+
+.login-page__brand {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.login-page__brand-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  background: #078C29;
+  color: var(--on-primary);
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--primary);
+}
+
+.admin-page__brand-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: #078C29;
+  color: var(--on-primary);
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--primary);
+  font-size: 1rem;
+}
+
+.login-page__title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.login-page__main {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.25rem 2rem;
+  gap: 1.5rem;
+  max-width: 540px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.login-page__intro {
+  text-align: center;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.login-page__intro h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+.login-page__intro p {
+  margin: 0;
+  color: #ffffff;
+}
+
+.login-page__form {
+  display: grid;
+  gap: 1rem;
+}
+
+.auth-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.auth-field__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000000;
+}
+
+.auth-field__input-wrapper {
+  position: relative;
+}
+
+.auth-field__input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0 1rem;
+  padding-right: 3rem;
+  border: 2px solid var(--primary);
+  background: var(--surface-container);
+  border-radius: 1rem;
+  color: #000000;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.auth-field__input:focus {
+  border-color: var(--primary);
+}
+
+.auth-field__icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary);
+}
+
+.login-page__actions {
+  display: grid;
+  gap: 1rem;
+}
+
+.login-page__link {
+  justify-self: end;
+  margin-right: 0.75rem;
+  color: #000000;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.login-page__footer-link,
+.login-page__footer p {
+  color: #9ca3af;
+}
+
+.login-page__footer-link {
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-page__footer-link:hover,
+.login-page__footer-link:visited {
+  color: #9ca3af;
+}
+
+.login-page__submit {
+  width: 100%;
+  min-height: 3.5rem;
+  border: none;
+  border-radius: 9999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease;
+}
+
+.login-page__footer {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto 4rem;
+  text-align: center;
+  display: grid;
+  gap: 4.5rem;
+}
+
+.login-page__footer p {
+  margin: 0;
+  color: #9ca3af;
+}
+
+.login-page__powered-by {
+  font-size: 0.75rem;
+  color: #8b95a1;
+}
+
+.login-page__error-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.login-page__error-message {
+  width: min(720px, calc(100% - 2rem));
+  background: var(--error);
+  color: var(--on-error);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 1.25rem;
+  padding: 1rem 1.25rem;
+  text-align: center;
+  font-weight: 700;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+}
+
+.login-page__submit:active {
+  transform: scale(0.98);
+}
+
+.section-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-divider__line {
+  height: 1px;
+  background: var(--outline);
+  border: none;
+}
+
+.section-divider__text {
+  font-size: 0.75rem;
+  color: var(--outline);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.social-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.social-buttons__button {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  color: var(--text-regular);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.social-buttons__button:hover {
+  background: var(--surface-container);
+}
+
+.admin-action-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: var(--surface-container-low);
+  color: var(--primary);
+  border: 1px solid var(--surface-tint);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  outline: none;
+}
+
+.admin-action-button:hover {
+  background: var(--surface-container-high);
+}
+
+.admin-action-button:active {
+  transform: scale(0.97);
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+.admin-action-button--selected {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+.admin-action-button.admin-action-button--selected:hover {
+  background: var(--primary-container);
+}
+
+.login-page__footer-link {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-page__background {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.login-page__glow {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(100px);
+  opacity: 0.2;
+}
+
+.login-page__glow--top {
+  top: -10%;
+  right: -10%;
+  width: 60%;
+  height: 40%;
+  background: var(--primary);
+}
+
+.login-page__glow--bottom {
+  bottom: -10%;
+  left: -10%;
+  width: 50%;
+  height: 30%;
+  background: var(--tertiary);
+}
+
+@media (max-width: 640px) {
+  .login-page__top {
+    padding-top: 1.5rem;
+  }
+
+  .login-page__main {
+    padding: 1.5rem 1rem 1.5rem;
+  }
+
+  .login-page__title {
+    font-size: 1.75rem;
+  }
+
+  .login-page__submit {
+    min-height: 3rem;
+  }
+}

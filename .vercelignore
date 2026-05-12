@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+.env.*
+Codici.txt
+.DS_Store
+Thumbs.db

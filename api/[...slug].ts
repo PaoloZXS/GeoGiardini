@@ -80,7 +80,21 @@ function extractCount(result: any) {
 }
 
 export default async function handler(req: any, res: any) {
-  const slug = Array.isArray(req.query.slug) ? req.query.slug : req.query.slug ? [req.query.slug] : [];
+  const rawUrl = typeof req.url === 'string' ? req.url : '';
+  const querySlug = Array.isArray(req.query.slug)
+    ? req.query.slug
+    : req.query.slug
+    ? [req.query.slug]
+    : req.query.path
+    ? Array.isArray(req.query.path)
+      ? req.query.path
+      : [req.query.path]
+    : [];
+  const slug = querySlug.length
+    ? querySlug
+    : rawUrl.startsWith('/api/')
+    ? rawUrl.replace(/^\/api\//, '').replace(/\?.*$/, '').split('/').filter(Boolean)
+    : [];
   const path = slug.join('/');
   const method = (req.method || 'GET').toUpperCase();
   const db = createDbClient();

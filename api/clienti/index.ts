@@ -1,4 +1,4 @@
-import { createDbClient, ensureClientiTable } from '../lib';
+import { createDbClient, ensureClientiTable } from '../../lib/db';
 
 export default async function handler(req: any, res: any) {
   const method = (req.method || 'GET').toUpperCase();

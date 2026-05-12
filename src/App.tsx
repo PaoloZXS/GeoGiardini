@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
 import ClientePage from './pages/ClientePage';
@@ -10,7 +10,7 @@ function App() {
   const [authenticatedRole, setAuthenticatedRole] = useState<'admin' | 'cliente' | 'giardiniere' | null>(null);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route
           path="/"

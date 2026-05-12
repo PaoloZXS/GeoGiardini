@@ -1,9 +1,13 @@
 import { createClient } from '@libsql/client';
 
-const databaseUrl = 'libsql://geogiardini-paolozxs.aws-eu-west-1.turso.io';
-const authToken = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzgwODIzMzgsImlkIjoiMDE5ZGZkOGItZWEwMS03NGI2LTkzNTUtZDgxNjI4YjEzMDlkIiwicmlkIjoiZjFjYTE4ZDktOTMxOS00MmFkLTg4NTEtNDFiODVlMTEzOTNiIn0.ZwsaKrGcqLR_THEJ9OUGCE8pOK8mRs7P8fuOhodrsDwIPrff5UVKA2oR6ePLNxRm0cpcmQmaIS1eSV7T0D16CA';
+const databaseUrl = process.env.TURSO_DATABASE_URL;
+const authToken = process.env.TURSO_AUTH_TOKEN;
 
 export function createDbClient() {
+  if (!databaseUrl || !authToken) {
+    throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be set in environment variables');
+  }
+
   return createClient({
     url: databaseUrl,
     authToken,
@@ -16,7 +20,9 @@ export async function ensureGiardinieriTable(db: ReturnType<typeof createDbClien
     []
   );
   const existingTables = Array.isArray(existingTablesResult.rows)
-    ? existingTablesResult.rows.map((row: any) => row[0]?.toString())
+    ? existingTablesResult.rows.map((row: any) =>
+        row?.name?.toString() ?? row?.[0]?.toString() ?? Object.values(row)[0]?.toString()
+      )
     : [];
 
   const hasGiardinieri = existingTables.includes('giardinieri');

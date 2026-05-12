@@ -13,30 +13,33 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route
+          path="/"
+          element={<LoginPage onLoginSuccess={(role) => setAuthenticatedRole(role)} />}
+        />
+        <Route
           path="/geologin"
           element={<LoginPage onLoginSuccess={(role) => setAuthenticatedRole(role)} />}
         />
-        <Route path="/login" element={<Navigate to="/geologin" replace />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
         <Route
           path="/admin"
           element={
-            authenticatedRole === 'admin' ? <AdminPage /> : <Navigate to="/geologin" replace />
+            authenticatedRole === 'admin' ? <AdminPage /> : <Navigate to="/" replace />
           }
         />
         <Route
           path="/cliente"
           element={
-            authenticatedRole === 'cliente' ? <ClientePage /> : <Navigate to="/geologin" replace />
+            authenticatedRole === 'cliente' ? <ClientePage /> : <Navigate to="/" replace />
           }
         />
         <Route
           path="/giardiniere"
           element={
-            authenticatedRole === 'giardiniere' ? <GiardinierePage /> : <Navigate to="/geologin" replace />
+            authenticatedRole === 'giardiniere' ? <GiardinierePage /> : <Navigate to="/" replace />
           }
         />
-        <Route path="/" element={<Navigate to="/geologin" replace />} />
-        <Route path="*" element={<Navigate to="/geologin" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

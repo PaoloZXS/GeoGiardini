@@ -23,7 +23,7 @@ function AdminPage() {
   const nomeClienteRef = useRef<HTMLInputElement | null>(null);
   const usernameRef = useRef<HTMLInputElement | null>(null);
 
-  const statusBoxClasses = `fixed top-8 left-1/2 z-50 w-[min(720px,calc(100%-2rem))] -translate-x-1/2 rounded-xl px-4 py-3 text-center text-sm font-medium shadow-2xl transition-transform duration-200 ${
+  const statusBoxClasses = `fixed top-8 left-1/2 z-[9999] w-[min(720px,calc(100%-2rem))] -translate-x-1/2 rounded-xl px-4 py-3 text-center text-sm font-medium shadow-2xl transition-transform duration-200 ${
     statusType === 'success'
       ? 'bg-tertiary text-on-tertiary border border-tertiary'
       : 'bg-error text-on-error border border-error'

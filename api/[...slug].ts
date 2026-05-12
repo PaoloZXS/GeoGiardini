@@ -90,11 +90,10 @@ export default async function handler(req: any, res: any) {
       ? req.query.path
       : [req.query.path]
     : [];
-  const slug = querySlug.length
-    ? querySlug
-    : rawUrl.startsWith('/api/')
+  const rawSlug = rawUrl.startsWith('/api/')
     ? rawUrl.replace(/^\/api\//, '').replace(/\?.*$/, '').split('/').filter(Boolean)
     : [];
+  const slug = rawSlug.length >= querySlug.length ? rawSlug : querySlug;
   const path = slug.join('/');
   const method = (req.method || 'GET').toUpperCase();
   const db = createDbClient();

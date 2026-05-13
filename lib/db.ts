@@ -14,6 +14,47 @@ export function createDbClient() {
   });
 }
 
+function normalizeColumnName(raw: unknown) {
+  return (raw ?? '').toString().trim().toLowerCase();
+}
+
+function extractTableColumns(rows: any[] | undefined) {
+  if (!Array.isArray(rows)) return [] as string[];
+
+  const found = new Set<string>();
+  for (const row of rows) {
+    const nameFromObject = row?.name ?? row?.column_name ?? row?.column;
+    if (nameFromObject != null) {
+      found.add(normalizeColumnName(nameFromObject));
+      continue;
+    }
+
+    if (Array.isArray(row) && row.length > 1) {
+      found.add(normalizeColumnName(row[1]));
+      continue;
+    }
+
+    const values = Object.values(row ?? {});
+    if (values.length > 1) {
+      found.add(normalizeColumnName(values[1]));
+    }
+  }
+
+  return [...found].filter(Boolean);
+}
+
+async function safeAddColumn(db: ReturnType<typeof createDbClient>, sql: string) {
+  try {
+    await db.execute(sql, []);
+  } catch (error) {
+    const message = error instanceof Error ? error.message.toLowerCase() : '';
+    if (message.includes('duplicate column name') || message.includes('already exists')) {
+      return;
+    }
+    throw error;
+  }
+}
+
 export async function ensureGiardinieriTable(db: ReturnType<typeof createDbClient>) {
   const existingTablesResult = await db.execute(
     "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('giardinieri', 'giardinieri_fix')",
@@ -63,12 +104,10 @@ export async function ensureGiardinieriTable(db: ReturnType<typeof createDbClien
   }
 
   const columnsResult = await db.execute("PRAGMA table_info('giardinieri')", []);
-  const columns = Array.isArray(columnsResult.rows)
-    ? columnsResult.rows.map((row: any) => row?.name?.toString() ?? row?.[1]?.toString() ?? Object.values(row)[1]?.toString())
-    : [];
+  const columns = extractTableColumns(columnsResult.rows);
 
   if (!columns.includes('attivo')) {
-    await db.execute('ALTER TABLE giardinieri ADD COLUMN attivo INTEGER NOT NULL DEFAULT 0', []);
+    await safeAddColumn(db, 'ALTER TABLE giardinieri ADD COLUMN attivo INTEGER NOT NULL DEFAULT 0');
   }
 }
 
@@ -79,18 +118,14 @@ export async function ensureClientiTable(db: ReturnType<typeof createDbClient>) 
   );
 
   const columnsResult = await db.execute("PRAGMA table_info('clienti')", []);
-  const columns = Array.isArray(columnsResult.rows)
-    ? columnsResult.rows.map((row: any) =>
-        row?.name?.toString() ?? row?.[1]?.toString() ?? Object.values(row)[1]?.toString()
-      )
-    : [];
+  const columns = extractTableColumns(columnsResult.rows);
 
   if (!columns.includes('codice')) {
-    await db.execute('ALTER TABLE clienti ADD COLUMN codice TEXT NOT NULL DEFAULT ""', []);
+    await safeAddColumn(db, 'ALTER TABLE clienti ADD COLUMN codice TEXT NOT NULL DEFAULT ""');
   }
 
   if (!columns.includes('attivo')) {
-    await db.execute('ALTER TABLE clienti ADD COLUMN attivo INTEGER NOT NULL DEFAULT 1', []);
+    await safeAddColumn(db, 'ALTER TABLE clienti ADD COLUMN attivo INTEGER NOT NULL DEFAULT 1');
   }
 }
 

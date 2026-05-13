@@ -1,5 +1,15 @@
 import { createDbClient, ensureClientiTable, ensureGiardinieriTable, extractCount } from '../lib/db';
 
+const activeValuesSql = "'1','true','t','yes','y','on','si'";
+
+function buildActivePredicate(columnName: string) {
+  return `(CASE
+    WHEN ${columnName} IS NULL THEN 0
+    WHEN LOWER(TRIM(CAST(${columnName} AS TEXT))) IN (${activeValuesSql}) THEN 1
+    ELSE 0
+  END) = 1`;
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
@@ -10,13 +20,18 @@ export default async function handler(req: any, res: any) {
     await ensureGiardinieriTable(db);
     await ensureClientiTable(db);
 
+    const giardinieriActivePredicate = buildActivePredicate('attivo');
+    const giardinieriInactivePredicate = `NOT (${giardinieriActivePredicate})`;
+    const clientiActivePredicate = buildActivePredicate('attivo');
+    const clientiInactivePredicate = `NOT (${clientiActivePredicate})`;
+
     const [giardResult, clientResult, giardActiveResult, giardInactiveResult, activeResult, inactiveResult] = await Promise.all([
       db.execute('SELECT COUNT(*) FROM giardinieri', []),
       db.execute('SELECT COUNT(*) FROM clienti', []),
-      db.execute('SELECT COUNT(*) FROM giardinieri WHERE attivo = 1', []),
-      db.execute('SELECT COUNT(*) FROM giardinieri WHERE attivo = 0', []),
-      db.execute('SELECT COUNT(*) FROM clienti WHERE attivo = 1', []),
-      db.execute('SELECT COUNT(*) FROM clienti WHERE attivo = 0', []),
+      db.execute(`SELECT COUNT(*) FROM giardinieri WHERE ${giardinieriActivePredicate}`, []),
+      db.execute(`SELECT COUNT(*) FROM giardinieri WHERE ${giardinieriInactivePredicate}`, []),
+      db.execute(`SELECT COUNT(*) FROM clienti WHERE ${clientiActivePredicate}`, []),
+      db.execute(`SELECT COUNT(*) FROM clienti WHERE ${clientiInactivePredicate}`, []),
     ]);
 
     return res.json({

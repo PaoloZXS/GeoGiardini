@@ -667,8 +667,8 @@ function AdminPage() {
                       Giardinieri registrati : <span className="font-bold">{giardinieriList.length}</span>
                     </p>
                     <p className="font-label-lg text-label-lg text-white italic flex items-center gap-8 whitespace-nowrap">
-                      <span>Giardinieri attivi : <span className="font-bold">{giardinieriAttiviCount}</span></span>
-                      <span>Giardinieri non attivi : <span className="font-bold">{giardinieriDisattiviCount}</span></span>
+                      <span>Giard. Attivi : <span className="font-bold">{giardinieriAttiviCount}</span></span>
+                      <span>Giard. Non attivi : <span className="font-bold">{giardinieriDisattiviCount}</span></span>
                     </p>
                   </div>
                   <div className="h-44 overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">

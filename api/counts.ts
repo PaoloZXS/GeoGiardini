@@ -13,13 +13,16 @@ export default async function handler(req: any, res: any) {
     await ensureGiardinieriTable(db);
     await ensureClientiTable(db);
 
+    const activePredicate = "LOWER(TRIM(CAST(attivo AS TEXT))) IN ('1', 'true', 'yes')";
+    const inactivePredicate = "LOWER(TRIM(CAST(attivo AS TEXT))) IN ('0', 'false', 'no')";
+
     const [giardResult, clientResult, giardActiveResult, giardInactiveResult, activeResult, inactiveResult] = await Promise.all([
       db.execute('SELECT COUNT(*) FROM giardinieri', []),
       db.execute('SELECT COUNT(*) FROM clienti', []),
-      db.execute('SELECT COUNT(*) FROM giardinieri WHERE attivo = 1', []),
-      db.execute('SELECT COUNT(*) FROM giardinieri WHERE attivo = 0', []),
-      db.execute('SELECT COUNT(*) FROM clienti WHERE attivo = 1', []),
-      db.execute('SELECT COUNT(*) FROM clienti WHERE attivo = 0', []),
+      db.execute(`SELECT COUNT(*) FROM giardinieri WHERE ${activePredicate}`, []),
+      db.execute(`SELECT COUNT(*) FROM giardinieri WHERE ${inactivePredicate}`, []),
+      db.execute(`SELECT COUNT(*) FROM clienti WHERE ${activePredicate}`, []),
+      db.execute(`SELECT COUNT(*) FROM clienti WHERE ${inactivePredicate}`, []),
     ]);
 
     res.statusCode = 200;

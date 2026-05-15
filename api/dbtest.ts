@@ -1,4 +1,4 @@
-import { createDbClient } from '../lib/db';
+import { createDbClient } from './db';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET') {

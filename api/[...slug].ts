@@ -67,7 +67,14 @@ export default async function handler(req: any, res: any) {
 
   try {
     if (path === '/hello' && method === 'GET') {
-      return json(res, 200, { success: true, message: 'Hello from the single API function.' });
+      return json(res, 200, {
+        success: true,
+        message: 'Hello from the single API function.',
+        env: {
+          TURSO_DATABASE_URL: Boolean(process.env.TURSO_DATABASE_URL),
+          TURSO_AUTH_TOKEN: Boolean(process.env.TURSO_AUTH_TOKEN),
+        },
+      });
     }
 
     const db = createDbClient();

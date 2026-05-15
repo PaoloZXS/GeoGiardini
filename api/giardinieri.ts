@@ -75,7 +75,6 @@ export default async function handler(req: any, res: any) {
     const db = await createDbClient();
 
     if (req.method === 'GET') {
-      await ensureGiardinieriTable(db);
       const result = await db.execute('SELECT id, username, codice, created_at, attivo FROM giardinieri ORDER BY created_at DESC', []);
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');

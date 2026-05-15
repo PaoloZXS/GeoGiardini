@@ -79,7 +79,6 @@ export default async function handler(req: any, res: any) {
     const db = await createDbClient();
 
     if (req.method === 'GET') {
-      await ensureAttivitaTable(db);
       const result = await db.execute('SELECT id, description, completed, created_at FROM attivita ORDER BY LOWER(description) ASC', []);
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');

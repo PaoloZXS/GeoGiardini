@@ -965,7 +965,7 @@ function AdminPage() {
         {selectedAction === 'giardinieri' && (
           <div className="fixed inset-0 z-50 grid place-items-center bg-inverse-surface/20 backdrop-blur-sm p-4 overflow-auto">
             <section
-              className="w-full max-w-[720px] h-[calc(100vh-1rem)] flex flex-col rounded-[32px] border border-outline-variant bg-surface-container-low shadow-2xl p-6 overflow-hidden"
+              className="w-full max-w-[720px] h-[calc(100vh-2rem)] flex flex-col rounded-[32px] border border-outline-variant bg-surface-container-low shadow-2xl p-6 overflow-hidden"
               style={{
                 backgroundImage: 'var(--page-background)',
                 backgroundSize: 'cover',
@@ -1035,7 +1035,7 @@ function AdminPage() {
                       <span>Giard. Non attivi : <span className="font-bold">{giardinieriDisattiviCount}</span></span>
                     </p>
                   </div>
-                  <div className="h-44 overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
+                  <div className="h-56 overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
                     {giardinieriList.length === 0 ? (
                       <p className="text-sm text-on-surface-variant text-center py-6">Nessun giardiniere presente.</p>
                     ) : (

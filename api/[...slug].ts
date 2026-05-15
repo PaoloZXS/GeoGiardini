@@ -173,7 +173,10 @@ async function ensureNotificheTable(db: ReturnType<typeof createDbClient>) {
 
 export default async function handler(req: any, res: any) {
   const slug = req.query?.slug;
-  const segments = Array.isArray(slug) ? slug : typeof slug === 'string' ? [slug] : [];
+  const segments = Array.isArray(slug) ? [...slug] : typeof slug === 'string' ? [slug] : [];
+  if (segments[0] === 'api') {
+    segments.shift();
+  }
   const path = '/' + segments.join('/');
   const method = (req.method || 'GET').toUpperCase();
 

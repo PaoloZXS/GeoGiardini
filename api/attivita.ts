@@ -1,4 +1,71 @@
-import { createDbClient, ensureAttivitaTable } from '../lib/db';
+async function createDbClient() {
+  const databaseUrl = process.env.TURSO_DATABASE_URL;
+  const authToken = process.env.TURSO_AUTH_TOKEN;
+
+  if (!databaseUrl || !authToken) {
+    throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be set in environment variables');
+  }
+
+  const { createClient } = await import('@libsql/client');
+  return createClient({ url: databaseUrl, authToken });
+}
+
+function normalizeColumnName(raw: unknown) {
+  return (raw ?? '').toString().trim().toLowerCase();
+}
+
+function extractTableColumns(rows: any[] | undefined) {
+  if (!Array.isArray(rows)) return [] as string[];
+
+  const found = new Set<string>();
+  for (const row of rows) {
+    const nameFromObject = row?.name ?? row?.column_name ?? row?.column;
+    if (nameFromObject != null) {
+      found.add(normalizeColumnName(nameFromObject));
+      continue;
+    }
+    if (Array.isArray(row) && row.length > 1) {
+      found.add(normalizeColumnName(row[1]));
+      continue;
+    }
+    const values = Object.values(row ?? {});
+    if (values.length > 1) {
+      found.add(normalizeColumnName(values[1]));
+    }
+  }
+
+  return Array.from(found).filter(Boolean);
+}
+
+async function safeAddColumn(db: any, sql: string) {
+  try {
+    await db.execute(sql, []);
+  } catch (error) {
+    const message = error instanceof Error ? error.message.toLowerCase() : '';
+    if (message.includes('duplicate column name') || message.includes('already exists')) {
+      return;
+    }
+    throw error;
+  }
+}
+
+async function ensureAttivitaTable(db: any) {
+  await db.execute(
+    'CREATE TABLE IF NOT EXISTS attivita (id TEXT PRIMARY KEY, description TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)',
+    []
+  );
+
+  const columnsResult = await db.execute("PRAGMA table_info('attivita')", []);
+  const columns = extractTableColumns(columnsResult.rows);
+
+  if (!columns.includes('description')) {
+    await safeAddColumn(db, 'ALTER TABLE attivita ADD COLUMN description TEXT NOT NULL DEFAULT ""');
+  }
+
+  if (!columns.includes('completed')) {
+    await safeAddColumn(db, 'ALTER TABLE attivita ADD COLUMN completed INTEGER NOT NULL DEFAULT 0');
+  }
+}
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -9,7 +76,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const db = createDbClient();
+    const db = await createDbClient();
 
     if (req.method === 'GET') {
       await ensureAttivitaTable(db);

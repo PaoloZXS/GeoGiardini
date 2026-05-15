@@ -1,4 +1,14 @@
-import { createDbClient } from '../lib/db';
+async function createDbClient() {
+  const databaseUrl = process.env.TURSO_DATABASE_URL;
+  const authToken = process.env.TURSO_AUTH_TOKEN;
+
+  if (!databaseUrl || !authToken) {
+    throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be set in environment variables');
+  }
+
+  const { createClient } = await import('@libsql/client');
+  return createClient({ url: databaseUrl, authToken });
+}
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -38,7 +48,7 @@ export default async function handler(req: any, res: any) {
       return;
     }
 
-    const db = createDbClient();
+    const db = await createDbClient();
     const query =
       role === 'giardiniere'
         ? 'SELECT id FROM giardinieri WHERE LOWER(username) = LOWER(?) AND codice = ? LIMIT 1'

@@ -1,4 +1,67 @@
-import { createDbClient, ensureGiardinieriTable } from '../lib/db';
+async function createDbClient() {
+  const databaseUrl = process.env.TURSO_DATABASE_URL;
+  const authToken = process.env.TURSO_AUTH_TOKEN;
+
+  if (!databaseUrl || !authToken) {
+    throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be set in environment variables');
+  }
+
+  const { createClient } = await import('@libsql/client');
+  return createClient({ url: databaseUrl, authToken });
+}
+
+function normalizeColumnName(raw: unknown) {
+  return (raw ?? '').toString().trim().toLowerCase();
+}
+
+function extractTableColumns(rows: any[] | undefined) {
+  if (!Array.isArray(rows)) return [] as string[];
+
+  const found = new Set<string>();
+  for (const row of rows) {
+    const nameFromObject = row?.name ?? row?.column_name ?? row?.column;
+    if (nameFromObject != null) {
+      found.add(normalizeColumnName(nameFromObject));
+      continue;
+    }
+    if (Array.isArray(row) && row.length > 1) {
+      found.add(normalizeColumnName(row[1]));
+      continue;
+    }
+    const values = Object.values(row ?? {});
+    if (values.length > 1) {
+      found.add(normalizeColumnName(values[1]));
+    }
+  }
+
+  return Array.from(found).filter(Boolean);
+}
+
+async function safeAddColumn(db: any, sql: string) {
+  try {
+    await db.execute(sql, []);
+  } catch (error) {
+    const message = error instanceof Error ? error.message.toLowerCase() : '';
+    if (message.includes('duplicate column name') || message.includes('already exists')) {
+      return;
+    }
+    throw error;
+  }
+}
+
+async function ensureGiardinieriTable(db: any) {
+  await db.execute(
+    'CREATE TABLE IF NOT EXISTS giardinieri (id TEXT PRIMARY KEY, username TEXT NOT NULL, codice TEXT NOT NULL, created_at TEXT NOT NULL, attivo INTEGER NOT NULL DEFAULT 0)',
+    []
+  );
+
+  const columnsResult = await db.execute("PRAGMA table_info('giardinieri')", []);
+  const columns = extractTableColumns(columnsResult.rows);
+
+  if (!columns.includes('attivo')) {
+    await safeAddColumn(db, 'ALTER TABLE giardinieri ADD COLUMN attivo INTEGER NOT NULL DEFAULT 0');
+  }
+}
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -9,7 +72,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const db = createDbClient();
+    const db = await createDbClient();
 
     if (req.method === 'GET') {
       await ensureGiardinieriTable(db);

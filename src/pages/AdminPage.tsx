@@ -1243,6 +1243,13 @@ function AdminPage() {
                   <label className="font-label-sm text-label-sm text-white font-bold block">
                     Codice
                   </label>
+                  <input
+                    className="w-full h-10 px-4 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm text-black font-bold"
+                    placeholder="Es. GARD-2024"
+                    type="text"
+                    value={codice}
+                    onChange={(event) => setCodice(event.target.value)}
+                  />
                   <div className="flex items-center gap-2 text-sm font-bold text-white whitespace-nowrap">
                     <label className="inline-flex items-center gap-2">
                       <input
@@ -1256,13 +1263,6 @@ function AdminPage() {
                       {`Giardiniere ${giardiniereAttivo ? "Attivo" : "Non attivo"}`}
                     </label>
                   </div>
-                  <input
-                    className="w-full h-10 px-4 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm text-black font-bold"
-                    placeholder="Es. GARD-2024"
-                    type="text"
-                    value={codice}
-                    onChange={(event) => setCodice(event.target.value)}
-                  />
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-hidden">

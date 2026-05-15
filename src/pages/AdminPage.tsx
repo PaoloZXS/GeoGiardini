@@ -1243,28 +1243,26 @@ function AdminPage() {
                   <label className="font-label-sm text-label-sm text-white font-bold block">
                     Codice
                   </label>
-                  <div className="flex items-center gap-4">
-                    <input
-                      className="flex-1 min-w-0 h-10 px-4 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm text-black font-bold"
-                      placeholder="Es. GARD-2024"
-                      type="text"
-                      value={codice}
-                      onChange={(event) => setCodice(event.target.value)}
-                    />
-                    <div className="ml-auto flex-shrink-0 flex items-center gap-2 text-sm font-bold text-white whitespace-nowrap">
-                      <label className="inline-flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4 accent-primary"
-                          checked={giardiniereAttivo}
-                          onChange={(event) =>
-                            setGiardiniereAttivo(event.target.checked)
-                          }
-                        />
-                        {giardiniereAttivo ? "Attivo" : "Non attivo"}
-                      </label>
-                    </div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-white whitespace-nowrap">
+                    <label className="inline-flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 accent-primary"
+                        checked={giardiniereAttivo}
+                        onChange={(event) =>
+                          setGiardiniereAttivo(event.target.checked)
+                        }
+                      />
+                      {`Giardiniere ${giardiniereAttivo ? "Attivo" : "Non attivo"}`}
+                    </label>
                   </div>
+                  <input
+                    className="w-full h-10 px-4 rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm text-black font-bold"
+                    placeholder="Es. GARD-2024"
+                    type="text"
+                    value={codice}
+                    onChange={(event) => setCodice(event.target.value)}
+                  />
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-hidden">
@@ -1276,7 +1274,7 @@ function AdminPage() {
                       </span>
                     </p>
                   </div>
-                  <div className="h-[20rem] overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
+                  <div className="h-[19rem] overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
                     {giardinieriList.length === 0 ? (
                       <p className="text-sm text-on-surface-variant text-center py-6">
                         Nessun giardiniere presente.

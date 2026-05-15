@@ -1,4 +1,4 @@
-import { createDbClient, ensureGiardinieriTable, ensureClientiTable, ensureAttivitaTable, extractCount } from '../lib/db';
+import { createDbClient, ensureGiardinieriTable, ensureClientiTable, ensureAttivitaTable, extractCount } from './lib/db';
 
 function json(res: any, status: number, body: any) {
   res.statusCode = status;

@@ -965,7 +965,7 @@ function AdminPage() {
         {selectedAction === 'giardinieri' && (
           <div className="fixed inset-0 z-50 grid place-items-center bg-inverse-surface/20 backdrop-blur-sm p-4 overflow-auto">
             <section
-              className="w-full max-w-[720px] max-h-[calc(100vh-2rem)] flex flex-col rounded-[32px] border border-outline-variant bg-surface-container-low shadow-2xl p-6 overflow-hidden"
+              className="w-full max-w-[720px] h-[calc(100vh-1rem)] flex flex-col rounded-[32px] border border-outline-variant bg-surface-container-low shadow-2xl p-6 overflow-hidden"
               style={{
                 backgroundImage: 'var(--page-background)',
                 backgroundSize: 'cover',
@@ -1101,7 +1101,7 @@ function AdminPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3 pt-4 pb-1">
+                <div className="mt-auto flex flex-col gap-3 pt-4 pb-1">
                   <button
                     className="w-full h-10 bg-primary text-on-primary font-label-sm rounded-full active:opacity-90 transition-all shadow-sm"
                     type="submit"

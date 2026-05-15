@@ -1268,29 +1268,15 @@ function AdminPage() {
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-hidden">
-                  <div className="mb-3 space-y-2">
+                  <div className="mb-1">
                     <p className="font-label-lg text-label-lg text-white italic font-bold">
                       Giardinieri registrati :{" "}
                       <span className="font-bold">
                         {giardinieriList.length}
                       </span>
                     </p>
-                    <p className="font-label-sm text-label-sm text-white/90 font-bold flex flex-wrap gap-4">
-                      <span>
-                        Attivi:{" "}
-                        <span className="font-bold">
-                          {giardinieriAttiviCount}
-                        </span>
-                      </span>
-                      <span>
-                        Non attivi:{" "}
-                        <span className="font-bold">
-                          {giardinieriDisattiviCount}
-                        </span>
-                      </span>
-                    </p>
                   </div>
-                  <div className="h-[24rem] overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
+                  <div className="h-[20rem] overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
                     {giardinieriList.length === 0 ? (
                       <p className="text-sm text-on-surface-variant text-center py-6">
                         Nessun giardiniere presente.

@@ -1030,12 +1030,12 @@ function AdminPage() {
                     <p className="font-label-lg text-label-lg text-white italic font-bold">
                       Giardinieri registrati : <span className="font-bold">{giardinieriList.length}</span>
                     </p>
-                    <p className="font-label-lg text-label-lg text-white italic flex items-center gap-10 whitespace-nowrap">
-                      <span>Giard. Attivi : <span className="font-bold">{giardinieriAttiviCount}</span></span>
-                      <span>Giard. Non attivi : <span className="font-bold">{giardinieriDisattiviCount}</span></span>
+                    <p className="font-label-sm text-label-sm text-white/90 font-bold flex flex-wrap gap-4">
+                      <span>Attivi: <span className="font-bold">{giardinieriAttiviCount}</span></span>
+                      <span>Non attivi: <span className="font-bold">{giardinieriDisattiviCount}</span></span>
                     </p>
                   </div>
-                  <div className="h-56 overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
+                  <div className="h-[24rem] overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
                     {giardinieriList.length === 0 ? (
                       <p className="text-sm text-on-surface-variant text-center py-6">Nessun giardiniere presente.</p>
                     ) : (

@@ -105,6 +105,52 @@ export async function ensureAttivitaTable(db: ReturnType<typeof createDbClient>)
   }
 }
 
+export async function ensureAppuntamentiTable(db: ReturnType<typeof createDbClient>) {
+  await db.execute(
+    'CREATE TABLE IF NOT EXISTS appuntamenti (id TEXT PRIMARY KEY, data TEXT NOT NULL, cliente_id INTEGER NOT NULL, note TEXT NOT NULL DEFAULT "", created_at TEXT NOT NULL)',
+    []
+  );
+}
+
+export async function ensureAppuntamentoGiardinieriTable(db: ReturnType<typeof createDbClient>) {
+  await db.execute(
+    'CREATE TABLE IF NOT EXISTS appuntamento_giardinieri (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, giardiniere_id TEXT NOT NULL, UNIQUE(appuntamento_id, giardiniere_id))',
+    []
+  );
+}
+
+export async function ensureAppuntamentoAttivitaTable(db: ReturnType<typeof createDbClient>) {
+  await db.execute(
+    'CREATE TABLE IF NOT EXISTS appuntamento_attivita (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, description TEXT NOT NULL)',
+    []
+  );
+}
+
+export async function ensureNotificheTable(db: ReturnType<typeof createDbClient>) {
+  await db.execute(
+    'CREATE TABLE IF NOT EXISTS notifiche (id TEXT PRIMARY KEY, giardiniere_id TEXT NOT NULL, appuntamento_id TEXT NOT NULL, cliente_id TEXT, title TEXT NOT NULL, message TEXT NOT NULL, read INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)',
+    []
+  );
+
+  const columnsResult = await db.execute("PRAGMA table_info('notifiche')", []);
+  const rows = Array.isArray(columnsResult.rows) ? columnsResult.rows : [];
+  const hasClienteId = rows.some((row: any) => {
+    const colName = row?.name?.toString?.().toLowerCase?.();
+    return colName === 'cliente_id';
+  });
+
+  if (!hasClienteId) {
+    try {
+      await db.execute('ALTER TABLE notifiche ADD COLUMN cliente_id TEXT', []);
+    } catch (error) {
+      const message = error instanceof Error ? error.message.toLowerCase() : '';
+      if (!message.includes('duplicate column name') && !message.includes('already exists')) {
+        throw error;
+      }
+    }
+  }
+}
+
 export function extractCount(result: any) {
   const row = result.rows?.[0];
   if (!row) return 0;

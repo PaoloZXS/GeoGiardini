@@ -1903,7 +1903,7 @@ function AdminPage() {
                 </div>
 
                 <div className="space-y-xs">
-                  <label className="font-label-lg text-label-lg text-white block px-1">Note per il giardiniere</label>
+                  <label className="font-label-sm text-label-sm text-white block px-1">Note per il giardiniere</label>
                   <textarea
                     className="h-28 w-full bg-surface-container-low border border-outline-variant rounded-xl p-md font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none transition-all"
                     placeholder="Dettagli aggiuntivi o istruzioni speciali..."

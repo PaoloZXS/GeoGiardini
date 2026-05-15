@@ -1408,7 +1408,7 @@ function AdminPage() {
                 onSubmit={handleSaveCliente}
               >
                 <div className="space-y-2">
-                  <label className="font-label-lg text-label-lg text-white font-bold block">
+                  <label className="pl-2 font-label-lg text-label-lg text-white font-bold block">
                     Nome Cliente
                   </label>
                   <input
@@ -1421,7 +1421,7 @@ function AdminPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="font-label-lg text-label-lg text-white font-bold block">
+                  <label className="pl-2 font-label-lg text-label-lg text-white font-bold block">
                     Indirizzo
                   </label>
                   <input
@@ -1436,7 +1436,7 @@ function AdminPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="font-label-sm text-label-sm text-white font-bold block">
+                    <label className="pl-2 font-label-sm text-label-sm text-white font-bold block">
                       Codice
                     </label>
                     <input
@@ -1448,7 +1448,7 @@ function AdminPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="font-label-sm text-label-sm text-white font-bold block">
+                    <label className="pl-2 font-label-sm text-label-sm text-white font-bold block">
                       Telefono
                     </label>
                     <input
@@ -1462,7 +1462,7 @@ function AdminPage() {
                     />
                   </div>
                 </div>
-                <div className="flex justify-end items-center gap-2 text-sm font-bold text-white mt-2">
+                <div className="flex items-center gap-2 text-sm font-bold text-white mt-2 pl-2">
                   <label className="inline-flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -1477,25 +1477,13 @@ function AdminPage() {
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-hidden">
-                  <div className="mb-3 space-y-2">
-                    <p className="font-label-lg text-label-lg text-white italic font-bold">
+                  <div className="mb-1">
+                    <p className="pl-2 font-label-lg text-label-lg text-white italic font-bold">
                       Clienti registrati:{" "}
                       <span className="font-bold">{clientiCount}</span>
                     </p>
-                    <p className="font-label-lg text-label-lg text-white italic flex flex-wrap gap-8">
-                      <span>
-                        Clienti attivi:{" "}
-                        <span className="font-bold">{clientiAttiviCount}</span>
-                      </span>
-                      <span className="ml-8">
-                        Clienti non attivi:{" "}
-                        <span className="font-bold">
-                          {clientiDisattiviCount}
-                        </span>
-                      </span>
-                    </p>
                   </div>
-                  <div className="h-40 overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
+                  <div className="h-36 overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
                     {clientiList.length === 0 ? (
                       <p className="text-sm text-on-surface-variant text-center py-6">
                         Nessun cliente presente.
@@ -1563,7 +1551,7 @@ function AdminPage() {
                   </div>
                 </div>
 
-                <div className="relative -top-6 flex flex-col gap-3 pt-4 pb-1">
+                <div className="flex flex-col gap-3 pt-8 pb-1">
                   <button
                     className="w-full h-10 bg-primary text-on-primary font-label-sm rounded-full active:opacity-90 transition-all shadow-sm"
                     type="submit"

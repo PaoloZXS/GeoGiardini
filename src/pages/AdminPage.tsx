@@ -1375,7 +1375,7 @@ function AdminPage() {
                   </div>
                 </div>
 
-                <div className="-mt-6 flex flex-col gap-3 pt-4 pb-1">
+                <div className="-mt-12 flex flex-col gap-3 pt-4 pb-1">
                   <button
                     className="w-full h-10 rounded-full bg-primary text-on-primary shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-sm"
                     type="submit"

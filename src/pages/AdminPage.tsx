@@ -1293,7 +1293,7 @@ function AdminPage() {
         {selectedAction === 'attivita' && (
           <div className="fixed inset-0 z-50 grid place-items-center bg-inverse-surface/20 backdrop-blur-sm p-4 overflow-auto">
             <section
-              className="w-full max-w-[720px] h-[calc(100vh-1rem)] flex flex-col rounded-[32px] border border-outline-variant bg-surface-container-low shadow-2xl p-6 overflow-hidden"
+              className="w-full max-w-[720px] h-[calc(100vh-3rem)] flex flex-col rounded-[32px] border border-outline-variant bg-surface-container-low shadow-2xl p-6 overflow-hidden"
               style={{
                 backgroundImage: 'var(--page-background)',
                 backgroundSize: 'cover',
@@ -1333,7 +1333,7 @@ function AdminPage() {
                       Attività inserite: <span className="font-bold">{attivitaList.length}</span>
                     </p>
                   </div>
-                  <div className="h-60 overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
+                  <div className="h-72 overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
                     {attivitaList.length === 0 ? (
                       <p className="text-sm text-on-surface-variant text-center py-6">Nessuna attività presente.</p>
                     ) : (

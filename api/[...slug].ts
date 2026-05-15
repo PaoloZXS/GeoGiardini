@@ -66,6 +66,10 @@ export default async function handler(req: any, res: any) {
   const method = (req.method || 'GET').toUpperCase();
 
   try {
+    if (path === '/hello' && method === 'GET') {
+      return json(res, 200, { success: true, message: 'Hello from the single API function.' });
+    }
+
     const db = createDbClient();
 
     if (path === '/login' && method === 'POST') {

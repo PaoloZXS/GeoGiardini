@@ -213,7 +213,8 @@ function AdminPage() {
     try {
       const res = await fetch('/api/attivita', { cache: 'no-store' });
       if (!res.ok) {
-        console.error('Caricamento attivita fallito', res.status);
+        const body = await res.text().catch(() => null);
+        console.error('Caricamento attivita fallito', res.status, body);
         return;
       }
       const data = await res.json();

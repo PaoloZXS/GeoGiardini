@@ -87,7 +87,8 @@ function AdminPage() {
     try {
       const res = await fetch('/api/giardinieri', { cache: 'no-store' });
       if (!res.ok) {
-        console.error('Caricamento giardinieri fallito', res.status);
+        const body = await res.text().catch(() => null);
+        console.error('Caricamento giardinieri fallito', res.status, body);
         return;
       }
       const data = await res.json();
@@ -107,7 +108,8 @@ function AdminPage() {
     try {
       const res = await fetch('/api/counts', { cache: 'no-store' });
       if (!res.ok) {
-        console.error('Conteggio totali fallito', res.status);
+        const body = await res.text().catch(() => null);
+        console.error('Conteggio totali fallito', res.status, body);
         return;
       }
       const data = await res.json();
@@ -185,7 +187,8 @@ function AdminPage() {
     try {
       const res = await fetch('/api/clienti', { cache: 'no-store' });
       if (!res.ok) {
-        console.error('Caricamento clienti fallito', res.status);
+        const body = await res.text().catch(() => null);
+        console.error('Caricamento clienti fallito', res.status, body);
         return;
       }
       const data = await res.json();
@@ -250,7 +253,8 @@ function AdminPage() {
     try {
       const res = await fetch('/api/notifiche', { cache: 'no-store' });
       if (!res.ok) {
-        console.error('Caricamento avvisi fallito', res.status);
+        const body = await res.text().catch(() => null);
+        console.error('Caricamento avvisi fallito', res.status, body);
         return;
       }
       const data = await res.json();

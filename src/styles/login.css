@@ -1,6 +1,13 @@
 :root {
   color-scheme: dark;
-  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    "Plus Jakarta Sans",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   color: #191c1b;
   background: #f8faf8;
   --surface: #f8faf8;
@@ -53,12 +60,11 @@
   --text-regular: #191c1b;
   --text-muted: #42493e;
   --shadow: 0 25px 80px rgba(20, 64, 18, 0.14);
-  --page-background: url('/images/sfondo1.jpg');
+  --page-background: url("/images/sfondo1.jpg");
 }
 
-.admin-page-root,
-.login-page {
-  background-color: #2FA04C;
+.admin-page-root {
+  background-color: #2fa04c;
   background-image: var(--page-background, none);
   background-position: center;
   background-size: cover;
@@ -66,6 +72,11 @@
 }
 
 .login-page {
+  background-color: #000000;
+  background-image: var(--page-background, none);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   min-height: 100vh;
   min-width: 320px;
   display: flex;
@@ -91,7 +102,7 @@
   width: 4rem;
   height: 4rem;
   border-radius: 9999px;
-  background: #078C29;
+  background: #078c29;
   color: var(--on-primary);
   display: grid;
   place-items: center;
@@ -102,7 +113,7 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 9999px;
-  background: #078C29;
+  background: #078c29;
   color: var(--on-primary);
   display: grid;
   place-items: center;
@@ -335,7 +346,10 @@
   color: var(--primary);
   border: 1px solid var(--surface-tint);
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    color 0.2s ease;
   outline: none;
 }
 

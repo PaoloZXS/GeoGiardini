@@ -1110,7 +1110,7 @@ function AdminPage() {
                     {isSaving ? 'Salvataggio...' : 'Salva'}
                   </button>
                   <button
-                    className="w-full h-10 border border-primary text-white font-bold font-label-sm rounded-full active:bg-surface-container-high transition-colors"
+                    className="flex w-full h-10 items-center justify-center rounded-full border border-primary text-white font-bold font-label-sm leading-none active:bg-surface-container-high transition-colors"
                     type="button"
                     onClick={handleCloseForm}
                   >

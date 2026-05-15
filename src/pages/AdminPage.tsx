@@ -1333,7 +1333,7 @@ function AdminPage() {
                       Attività inserite: <span className="font-bold">{attivitaList.length}</span>
                     </p>
                   </div>
-                  <div className="h-80 overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
+                  <div className="h-[22rem] overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
                     {attivitaList.length === 0 ? (
                       <p className="text-sm text-on-surface-variant text-center py-6">Nessuna attività presente.</p>
                     ) : (

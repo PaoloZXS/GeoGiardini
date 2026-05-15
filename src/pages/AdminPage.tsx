@@ -1227,7 +1227,7 @@ function AdminPage() {
                 onSubmit={handleSave}
               >
                 <div className="space-y-2">
-                  <label className="font-label-lg text-label-lg text-white font-bold block">
+                  <label className="font-label-lg text-label-lg text-white font-bold block pl-2">
                     Username
                   </label>
                   <input
@@ -1240,7 +1240,7 @@ function AdminPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="font-label-sm text-label-sm text-white font-bold block">
+                  <label className="font-label-sm text-label-sm text-white font-bold block pl-2">
                     Codice
                   </label>
                   <input
@@ -1250,7 +1250,7 @@ function AdminPage() {
                     value={codice}
                     onChange={(event) => setCodice(event.target.value)}
                   />
-                  <div className="flex items-center gap-2 text-sm font-bold text-white whitespace-nowrap">
+                  <div className="mt-2 pl-2 flex items-center gap-2 text-sm font-bold text-white whitespace-nowrap">
                     <label className="inline-flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -1267,14 +1267,14 @@ function AdminPage() {
 
                 <div className="flex-1 min-h-0 overflow-hidden">
                   <div className="mb-1">
-                    <p className="font-label-lg text-label-lg text-white italic font-bold">
+                    <p className="pl-2 font-label-lg text-label-lg text-white italic font-bold">
                       Giardinieri registrati :{" "}
                       <span className="font-bold">
                         {giardinieriList.length}
                       </span>
                     </p>
                   </div>
-                  <div className="h-[19rem] overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
+                  <div className="h-[18.5rem] overflow-y-auto rounded-2xl border-2 border-outline-variant bg-surface p-2 space-y-2">
                     {giardinieriList.length === 0 ? (
                       <p className="text-sm text-on-surface-variant text-center py-6">
                         Nessun giardiniere presente.

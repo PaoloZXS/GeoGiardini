@@ -64,9 +64,10 @@ export default async function handler(req: any, res: any) {
   const segments = Array.isArray(slug) ? slug : typeof slug === 'string' ? [slug] : [];
   const path = '/' + segments.join('/');
   const method = (req.method || 'GET').toUpperCase();
-  const db = createDbClient();
 
   try {
+    const db = createDbClient();
+
     if (path === '/login' && method === 'POST') {
       const { role, username, code } = req.body ?? {};
       if (!['admin', 'giardiniere', 'cliente'].includes(role)) {

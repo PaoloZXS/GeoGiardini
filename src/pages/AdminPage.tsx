@@ -1312,7 +1312,7 @@ function AdminPage() {
                   onClick={handleCloseForm}
                   aria-label="Chiudi attività"
                 >
-                  <span className="inline-flex items-center justify-center leading-none -translate-y-[1px]">+</span>
+                  <span className="material-symbols-outlined text-[22px] leading-none">cleaning_services</span>
                 </button>
               </div>
               <form className="flex flex-col h-full gap-md" onSubmit={handleSaveAttivita}>

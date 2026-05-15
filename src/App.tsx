@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
@@ -8,6 +8,14 @@ import './styles/login.css';
 
 function App() {
   const [authenticatedRole, setAuthenticatedRole] = useState<'admin' | 'cliente' | 'giardiniere' | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = window.localStorage.getItem('loginRole');
+    if (stored === 'admin' || stored === 'cliente' || stored === 'giardiniere') {
+      setAuthenticatedRole(stored);
+    }
+  }, []);
 
   return (
     <HashRouter>

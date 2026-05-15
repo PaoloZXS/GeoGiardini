@@ -44,7 +44,30 @@ async function startServer() {
       const rows = Array.isArray(result.rows) ? result.rows : [];
 
       if (rows.length > 0) {
-        return res.status(200).json({ success: true, role, username });
+        const firstRow = rows[0] as any;
+        const normalizeValue = (value: unknown) => {
+          if (typeof value === 'string') return value;
+          if (value == null) return undefined;
+          if (typeof (value as any).toString === 'function') return (value as any).toString();
+          return undefined;
+        };
+
+        const userId =
+          normalizeValue(firstRow?.id) ??
+          normalizeValue(firstRow?.ID) ??
+          normalizeValue(firstRow?.Id) ??
+          normalizeValue(Array.isArray(firstRow) ? firstRow[0] : undefined) ??
+          normalizeValue(Object.values(firstRow)[0]) ??
+          '';
+
+        console.log('login query rows', rows, 'userId', userId);
+
+        return res.status(200).json({
+          success: true,
+          role,
+          username,
+          id: userId,
+        });
       }
 
       return res.status(401).json({ success: false, message: 'Credenziali errate.' });
@@ -334,6 +357,397 @@ async function startServer() {
     } catch (error) {
       console.error('Deleting cliente failed', error);
       return res.status(500).json({ success: false, message: 'Errore durante l\'eliminazione cliente.' });
+    }
+  });
+
+  async function ensureAttivitaTable() {
+    await db.execute(
+      'CREATE TABLE IF NOT EXISTS attivita (id TEXT PRIMARY KEY, description TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)',
+      []
+    );
+  }
+
+  async function ensureAppuntamentiTable() {
+    await db.execute(
+      'CREATE TABLE IF NOT EXISTS appuntamenti (id TEXT PRIMARY KEY, data TEXT NOT NULL, cliente_id INTEGER NOT NULL, note TEXT NOT NULL DEFAULT "", created_at TEXT NOT NULL)',
+      []
+    );
+  }
+
+  async function ensureAppuntamentoGiardinieriTable() {
+    await db.execute(
+      'CREATE TABLE IF NOT EXISTS appuntamento_giardinieri (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, giardiniere_id TEXT NOT NULL, UNIQUE(appuntamento_id, giardiniere_id))',
+      []
+    );
+  }
+
+  async function ensureAppuntamentoAttivitaTable() {
+    await db.execute(
+      'CREATE TABLE IF NOT EXISTS appuntamento_attivita (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, description TEXT NOT NULL)',
+      []
+    );
+  }
+
+  async function ensureNotificheTable() {
+    await db.execute(
+      'CREATE TABLE IF NOT EXISTS notifiche (id TEXT PRIMARY KEY, giardiniere_id TEXT NOT NULL, appuntamento_id TEXT NOT NULL, cliente_id TEXT, title TEXT NOT NULL, message TEXT NOT NULL, read INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)',
+      []
+    );
+
+    const columnsResult = await db.execute("PRAGMA table_info('notifiche')", []);
+    const rows = Array.isArray(columnsResult.rows) ? columnsResult.rows : [];
+    const hasClienteId = rows.some((row: any) => {
+      const colName = row?.name?.toString?.().toLowerCase?.();
+      return colName === 'cliente_id';
+    });
+
+    if (!hasClienteId) {
+      try {
+        await db.execute('ALTER TABLE notifiche ADD COLUMN cliente_id TEXT', []);
+      } catch (error) {
+        const message = error instanceof Error ? error.message.toLowerCase() : '';
+        if (!message.includes('duplicate column name') && !message.includes('already exists')) {
+          throw error;
+        }
+      }
+    }
+  }
+
+  app.post('/api/appuntamenti', async (req, res) => {
+    try {
+      const { data, clienteId, giardinieriIds, attivita, note } = req.body as {
+        data?: string;
+        clienteId?: string | number;
+        giardinieriIds?: unknown;
+        attivita?: unknown;
+        note?: string;
+      };
+      const trimmedData = data?.toString().trim();
+      const trimmedClienteId = clienteId?.toString().trim();
+      const selectedGiardinieri = Array.isArray(giardinieriIds)
+        ? giardinieriIds.map((item) => item?.toString().trim()).filter((item) => item)
+        : [];
+      const selectedAttivita = Array.isArray(attivita)
+        ? attivita.map((item) => item?.toString().trim()).filter((item) => item)
+        : [];
+      const noteText = note?.toString().trim() ?? '';
+
+      if (!trimmedData || !trimmedClienteId || selectedGiardinieri.length === 0) {
+        return res.status(400).json({ success: false, message: 'Data, cliente e almeno un giardiniere sono obbligatori.' });
+      }
+
+      await ensureClientiTable();
+      await ensureGiardinieriTable();
+      await ensureAppuntamentiTable();
+      await ensureAppuntamentoGiardinieriTable();
+      await ensureAppuntamentoAttivitaTable();
+      await ensureNotificheTable();
+
+      const clientResult = await db.execute('SELECT nome FROM clienti WHERE id = ? LIMIT 1', [trimmedClienteId]);
+      const clientRows = Array.isArray(clientResult.rows) ? clientResult.rows : [];
+      const clienteNome = clientRows[0]?.nome?.toString?.() ?? 'cliente';
+
+      const appointmentId = crypto.randomUUID();
+      await db.execute(
+        'INSERT INTO appuntamenti (id, data, cliente_id, note, created_at) VALUES (?, ?, ?, ?, ?)',
+        [appointmentId, trimmedData, trimmedClienteId, noteText, new Date().toISOString()]
+      );
+
+      for (const giardiniereId of selectedGiardinieri) {
+        await db.execute(
+          'INSERT INTO appuntamento_giardinieri (id, appuntamento_id, giardiniere_id) VALUES (?, ?, ?)',
+          [crypto.randomUUID(), appointmentId, giardiniereId]
+        );
+      }
+
+      for (const activity of selectedAttivita) {
+        await db.execute(
+          'INSERT INTO appuntamento_attivita (id, appuntamento_id, description) VALUES (?, ?, ?)',
+          [crypto.randomUUID(), appointmentId, activity]
+        );
+      }
+
+      const formattedDate = new Date(trimmedData).toLocaleDateString('it-IT');
+      const notificationTitle = 'Appuntamento da :';
+      const notificationMessage = `Cliente : ${clienteNome}\nAttività da svolgere : ${selectedAttivita.join(', ')}\nData Appuntamento : ${formattedDate}`;
+
+      for (const giardiniereId of selectedGiardinieri) {
+        await db.execute(
+          'INSERT INTO notifiche (id, giardiniere_id, appuntamento_id, title, message, read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [crypto.randomUUID(), giardiniereId, appointmentId, notificationTitle, notificationMessage, 0, new Date().toISOString()]
+        );
+      }
+
+      return res.json({ success: true });
+    } catch (error) {
+      console.error('Saving appuntamento failed', error);
+      return res.status(500).json({ success: false, message: 'Errore durante il salvataggio dell\'appuntamento.' });
+    }
+  });
+
+  app.get('/api/appuntamenti', async (req, res) => {
+    try {
+      await ensureAppuntamentiTable();
+      await ensureAppuntamentoGiardinieriTable();
+      await ensureAppuntamentoAttivitaTable();
+      await ensureClientiTable();
+      await ensureGiardinieriTable();
+
+      const giardiniereId = req.query.giardiniereId?.toString()?.trim();
+      const clienteId = req.query.clienteId?.toString()?.trim();
+
+      const whereClauses: string[] = [];
+      const params: any[] = [];
+
+      if (giardiniereId) {
+        whereClauses.push('ag.giardiniere_id = ?');
+        params.push(giardiniereId);
+      }
+      if (clienteId) {
+        whereClauses.push('a.cliente_id = ?');
+        params.push(clienteId);
+      }
+
+      const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
+      const result = await db.execute(
+        `SELECT
+          a.id AS appointment_id,
+          a.data AS appointment_date,
+          a.cliente_id AS cliente_id,
+          c.nome AS cliente_nome,
+          a.note AS appointment_note,
+          a.created_at AS appointment_created_at,
+          gi.id AS giardiniere_id,
+          gi.username AS giardiniere_username,
+          aa.description AS activity_description
+        FROM appuntamenti a
+        LEFT JOIN clienti c ON c.id = a.cliente_id
+        LEFT JOIN appuntamento_giardinieri ag ON ag.appuntamento_id = a.id
+        LEFT JOIN giardinieri gi ON gi.id = ag.giardiniere_id
+        LEFT JOIN appuntamento_attivita aa ON aa.appuntamento_id = a.id
+        ${whereSql}
+        ORDER BY a.data DESC, a.created_at DESC`,
+        params
+      );
+
+      const rows = Array.isArray(result.rows) ? result.rows : [];
+      const appointmentsMap = new Map<string, any>();
+
+      for (const row of rows) {
+        const appointmentId = row?.appointment_id?.toString();
+        if (!appointmentId) continue;
+
+        if (!appointmentsMap.has(appointmentId)) {
+          appointmentsMap.set(appointmentId, {
+            id: appointmentId,
+            data: row?.appointment_date ?? '',
+            clienteId: row?.cliente_id ?? '',
+            clienteNome: row?.cliente_nome ?? '',
+            note: row?.appointment_note ?? '',
+            createdAt: row?.appointment_created_at ?? '',
+            giardinieri: [],
+            attivita: [],
+          });
+        }
+
+        const appointment = appointmentsMap.get(appointmentId);
+
+        const giardiniereIdValue = row?.giardiniere_id?.toString();
+        const giardiniereUsernameValue = row?.giardiniere_username?.toString();
+        if (giardiniereIdValue && giardiniereUsernameValue) {
+          if (!appointment.giardinieri.some((item: any) => item.id === giardiniereIdValue)) {
+            appointment.giardinieri.push({ id: giardiniereIdValue, username: giardiniereUsernameValue });
+          }
+        }
+
+        const activityDescription = row?.activity_description?.toString();
+        if (activityDescription && !appointment.attivita.includes(activityDescription)) {
+          appointment.attivita.push(activityDescription);
+        }
+      }
+
+      return res.json({ success: true, appointments: [...appointmentsMap.values()] });
+    } catch (error) {
+      console.error('Fetching appuntamenti failed', error);
+      return res.status(500).json({ success: false, appointments: [], message: 'Errore caricamento appuntamenti.' });
+    }
+  });
+
+  app.get('/api/notifiche', async (req, res) => {
+    try {
+      await ensureNotificheTable();
+      const giardiniereId = req.query.giardiniereId?.toString()?.trim();
+      const readFilter = req.query.read?.toString()?.trim();
+
+      const whereClauses: string[] = [];
+      const params: any[] = [];
+
+      if (giardiniereId) {
+        whereClauses.push('n.giardiniere_id = ?');
+        params.push(giardiniereId);
+      }
+
+      if (readFilter === '0' || readFilter === 'false') {
+        whereClauses.push('n.read = 0');
+      } else if (readFilter === '1' || readFilter === 'true') {
+        whereClauses.push('n.read = 1');
+      }
+
+      const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+      const result = await db.execute(
+        `SELECT n.id, n.giardiniere_id, gi.username AS giardiniere_username, n.appuntamento_id, n.cliente_id, c.nome AS cliente_nome, n.title, n.message, n.read, n.created_at FROM notifiche n LEFT JOIN giardinieri gi ON gi.id = n.giardiniere_id LEFT JOIN clienti c ON c.id = n.cliente_id ${whereSql} ORDER BY n.created_at DESC`,
+        params
+      );
+
+      const rows = Array.isArray(result.rows) ? result.rows : [];
+      return res.json({ success: true, notifiche: rows });
+    } catch (error) {
+      console.error('Fetching notifiche failed', error);
+      return res.status(500).json({ success: false, notifiche: [], message: 'Errore caricamento notifiche.' });
+    }
+  });
+
+  app.post('/api/notifiche', async (req, res) => {
+    try {
+      const { title, message, giardinieriIds, clienteId } = req.body as {
+        title?: string;
+        message?: string;
+        giardinieriIds?: unknown;
+        clienteId?: string | number;
+      };
+
+      const trimmedTitle = title?.toString().trim() || 'Messaggio dall\' Amministratore';
+      const trimmedMessage = message?.toString().trim();
+      const trimmedClienteId = clienteId?.toString().trim();
+      const selectedGiardinieri = Array.isArray(giardinieriIds)
+        ? giardinieriIds.map((item) => item?.toString().trim()).filter((item) => item)
+        : [];
+
+      if (!trimmedMessage) {
+        return res.status(400).json({ success: false, message: 'Messaggio è obbligatorio.' });
+      }
+
+      await ensureGiardinieriTable();
+      await ensureNotificheTable();
+
+      let recipients = selectedGiardinieri;
+      if (recipients.length === 0) {
+        const giardinieriResult = await db.execute('SELECT id FROM giardinieri WHERE attivo = 1');
+        const giardinieriRows = Array.isArray(giardinieriResult.rows) ? giardinieriResult.rows : [];
+        recipients = giardinieriRows.map((row: any) => row?.id?.toString?.()).filter((id) => id);
+      }
+
+      if (recipients.length === 0) {
+        return res.status(400).json({ success: false, message: 'Nessun giardiniere selezionato o attivo.' });
+      }
+
+      const createdAt = new Date().toISOString();
+      for (const giardiniereId of recipients) {
+        await db.execute(
+          'INSERT INTO notifiche (id, giardiniere_id, appuntamento_id, cliente_id, title, message, read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          [crypto.randomUUID(), giardiniereId, '', trimmedClienteId || null, trimmedTitle, trimmedMessage, 0, createdAt]
+        );
+      }
+
+      return res.json({ success: true });
+    } catch (error) {
+      console.error('Creating notifiche failed', error);
+      return res.status(500).json({ success: false, message: 'Errore durante la creazione dell\'avviso.' });
+    }
+  });
+
+  app.put('/api/notifiche/:id/read', async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      if (!id) {
+        return res.status(400).json({ success: false, message: 'Id notifica mancante.' });
+      }
+
+      await ensureNotificheTable();
+      await db.execute('UPDATE notifiche SET read = 1 WHERE id = ?', [id]);
+      return res.json({ success: true });
+    } catch (error) {
+      console.error('Marking notification read failed', error);
+      return res.status(500).json({ success: false, message: 'Errore durante l\'aggiornamento della notifica.' });
+    }
+  });
+
+  app.post('/api/attivita', async (req, res) => {
+    try {
+      const { description } = req.body as { description?: string };
+      const trimmedDescription = description?.toString().trim();
+
+      if (!trimmedDescription) {
+        return res.status(400).json({ success: false, message: 'La descrizione dell\'attività è obbligatoria.' });
+      }
+
+      await ensureAttivitaTable();
+      await db.execute(
+        'INSERT INTO attivita (id, description, completed, created_at) VALUES (?, ?, ?, ?)',
+        [crypto.randomUUID(), trimmedDescription, 0, new Date().toISOString()]
+      );
+
+      return res.json({ success: true });
+    } catch (error) {
+      console.error('Saving attivita failed', error);
+      return res.status(500).json({ success: false, message: 'Errore durante il salvataggio dell\'attività.' });
+    }
+  });
+
+  app.get('/api/attivita', async (req, res) => {
+    try {
+      await ensureAttivitaTable();
+      const result = await db.execute('SELECT id, description, completed, created_at FROM attivita ORDER BY LOWER(description) ASC', []);
+      return res.json({ success: true, attivita: result.rows || [] });
+    } catch (error) {
+      console.error('Fetching attivita failed', error);
+      return res.status(500).json({ success: false, attivita: [], message: 'Errore caricamento attività.' });
+    }
+  });
+
+  app.put('/api/attivita/:id', async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const { description, completed } = req.body as { description?: string; completed?: boolean | number };
+      const trimmedDescription = description?.toString().trim();
+      const isCompleted = completed ? 1 : 0;
+
+      if (!id || (trimmedDescription === undefined && completed === undefined)) {
+        return res.status(400).json({ success: false, message: 'Dati attività non validi.' });
+      }
+
+      await ensureAttivitaTable();
+      const updates: string[] = [];
+      const params: any[] = [];
+
+      if (trimmedDescription !== undefined) {
+        updates.push('description = ?');
+        params.push(trimmedDescription);
+      }
+      if (completed !== undefined) {
+        updates.push('completed = ?');
+        params.push(isCompleted);
+      }
+      params.push(id);
+
+      await db.execute(`UPDATE attivita SET ${updates.join(', ')} WHERE id = ?`, params);
+      return res.json({ success: true });
+    } catch (error) {
+      console.error('Updating attivita failed', error);
+      return res.status(500).json({ success: false, message: 'Errore durante l\'aggiornamento dell\'attività.' });
+    }
+  });
+
+  app.delete('/api/attivita/:id', async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      await ensureAttivitaTable();
+      await db.execute('DELETE FROM attivita WHERE id = ?', [id]);
+      return res.json({ success: true });
+    } catch (error) {
+      console.error('Deleting attivita failed', error);
+      return res.status(500).json({ success: false, message: 'Errore durante l\'eliminazione dell\'attività.' });
     }
   });
 

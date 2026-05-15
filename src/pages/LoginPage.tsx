@@ -88,6 +88,19 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
         return;
       }
 
+      if (!result.id) {
+        setError('Login riuscito ma id utente mancante. Riprova.');
+        return;
+      }
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('loginRole', loginRole);
+        window.localStorage.setItem('loginUsername', username.trim());
+        if (result.id) {
+          window.localStorage.setItem('userId', result.id.toString());
+        }
+      }
+
       onLoginSuccess(loginRole);
       if (loginRole === 'cliente') {
         navigate('/cliente');

@@ -87,6 +87,24 @@ export async function ensureClientiTable(db: ReturnType<typeof createDbClient>) 
   }
 }
 
+export async function ensureAttivitaTable(db: ReturnType<typeof createDbClient>) {
+  await db.execute(
+    'CREATE TABLE IF NOT EXISTS attivita (id TEXT PRIMARY KEY, description TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)',
+    []
+  );
+
+  const columnsResult = await db.execute("PRAGMA table_info('attivita')", []);
+  const columns = extractTableColumns(columnsResult.rows);
+
+  if (!columns.includes('description')) {
+    await safeAddColumn(db, 'ALTER TABLE attivita ADD COLUMN description TEXT NOT NULL DEFAULT ""');
+  }
+
+  if (!columns.includes('completed')) {
+    await safeAddColumn(db, 'ALTER TABLE attivita ADD COLUMN completed INTEGER NOT NULL DEFAULT 0');
+  }
+}
+
 export function extractCount(result: any) {
   const row = result.rows?.[0];
   if (!row) return 0;

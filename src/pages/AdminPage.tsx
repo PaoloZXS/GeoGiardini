@@ -1912,7 +1912,7 @@ function AdminPage() {
                   />
                 </div>
 
-                <div className="-mt-10 flex flex-col gap-3 pt-4 pb-1">
+                <div className="-mt-4 flex flex-col gap-3 pt-4 pb-1">
                   <button
                     className="w-full h-10 rounded-full bg-primary text-on-primary shadow-lg active:scale-95 transition-transform"
                     type="submit"

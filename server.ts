@@ -567,7 +567,7 @@ async function startServer() {
         }
       }
 
-      return res.json({ success: true, appointments: [...appointmentsMap.values()] });
+      return res.json({ success: true, appointments: Array.from(appointmentsMap.values()) });
     } catch (error) {
       console.error('Fetching appuntamenti failed', error);
       return res.status(500).json({ success: false, appointments: [], message: 'Errore caricamento appuntamenti.' });

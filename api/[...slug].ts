@@ -348,7 +348,7 @@ export default async function handler(req: any, res: any) {
             appointment.attivita.push(activityDescription);
           }
         }
-        return json(res, 200, { success: true, appointments: [...appointmentsMap.values()] });
+        return json(res, 200, { success: true, appointments: Array.from(appointmentsMap.values()) });
       }
       if (method === 'POST') {
         const { data, clienteId, giardinieriIds, attivita, note } = req.body ?? {};

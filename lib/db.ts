@@ -40,7 +40,7 @@ function extractTableColumns(rows: any[] | undefined) {
     }
   }
 
-  return [...found].filter(Boolean);
+  return Array.from(found).filter(Boolean);
 }
 
 async function safeAddColumn(db: ReturnType<typeof createDbClient>, sql: string) {

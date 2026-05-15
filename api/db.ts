@@ -1,13 +1,12 @@
-import { createClient } from '@libsql/client';
-
 const databaseUrl = process.env.TURSO_DATABASE_URL;
 const authToken = process.env.TURSO_AUTH_TOKEN;
 
-export function createDbClient() {
+export async function createDbClient() {
   if (!databaseUrl || !authToken) {
     throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be set in environment variables');
   }
 
+  const { createClient } = await import('@libsql/client');
   return createClient({ url: databaseUrl, authToken });
 }
 
@@ -38,7 +37,7 @@ function extractTableColumns(rows: any[] | undefined) {
   return Array.from(found).filter(Boolean);
 }
 
-async function safeAddColumn(db: ReturnType<typeof createDbClient>, sql: string) {
+async function safeAddColumn(db: any, sql: string) {
   try {
     await db.execute(sql, []);
   } catch (error) {
@@ -50,7 +49,7 @@ async function safeAddColumn(db: ReturnType<typeof createDbClient>, sql: string)
   }
 }
 
-export async function ensureGiardinieriTable(db: ReturnType<typeof createDbClient>) {
+export async function ensureGiardinieriTable(db: any) {
   await db.execute(
     'CREATE TABLE IF NOT EXISTS giardinieri (id TEXT PRIMARY KEY, username TEXT NOT NULL, codice TEXT NOT NULL, created_at TEXT NOT NULL, attivo INTEGER NOT NULL DEFAULT 0)',
     []
@@ -64,7 +63,7 @@ export async function ensureGiardinieriTable(db: ReturnType<typeof createDbClien
   }
 }
 
-export async function ensureClientiTable(db: ReturnType<typeof createDbClient>) {
+export async function ensureClientiTable(db: any) {
   await db.execute(
     'CREATE TABLE IF NOT EXISTS clienti (id INTEGER PRIMARY KEY, nome TEXT, indirizzo TEXT, telefono TEXT, codice TEXT NOT NULL DEFAULT "", attivo INTEGER NOT NULL DEFAULT 1)',
     []
@@ -82,7 +81,7 @@ export async function ensureClientiTable(db: ReturnType<typeof createDbClient>) 
   }
 }
 
-export async function ensureAttivitaTable(db: ReturnType<typeof createDbClient>) {
+export async function ensureAttivitaTable(db: any) {
   await db.execute(
     'CREATE TABLE IF NOT EXISTS attivita (id TEXT PRIMARY KEY, description TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)',
     []
@@ -100,28 +99,28 @@ export async function ensureAttivitaTable(db: ReturnType<typeof createDbClient>)
   }
 }
 
-export async function ensureAppuntamentiTable(db: ReturnType<typeof createDbClient>) {
+export async function ensureAppuntamentiTable(db: any) {
   await db.execute(
     'CREATE TABLE IF NOT EXISTS appuntamenti (id TEXT PRIMARY KEY, data TEXT NOT NULL, cliente_id INTEGER NOT NULL, note TEXT NOT NULL DEFAULT "", created_at TEXT NOT NULL)',
     []
   );
 }
 
-export async function ensureAppuntamentoGiardinieriTable(db: ReturnType<typeof createDbClient>) {
+export async function ensureAppuntamentoGiardinieriTable(db: any) {
   await db.execute(
     'CREATE TABLE IF NOT EXISTS appuntamento_giardinieri (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, giardiniere_id TEXT NOT NULL, UNIQUE(appuntamento_id, giardiniere_id))',
     []
   );
 }
 
-export async function ensureAppuntamentoAttivitaTable(db: ReturnType<typeof createDbClient>) {
+export async function ensureAppuntamentoAttivitaTable(db: any) {
   await db.execute(
     'CREATE TABLE IF NOT EXISTS appuntamento_attivita (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, description TEXT NOT NULL)',
     []
   );
 }
 
-export async function ensureNotificheTable(db: ReturnType<typeof createDbClient>) {
+export async function ensureNotificheTable(db: any) {
   await db.execute(
     'CREATE TABLE IF NOT EXISTS notifiche (id TEXT PRIMARY KEY, giardiniere_id TEXT NOT NULL, appuntamento_id TEXT NOT NULL, cliente_id TEXT, title TEXT NOT NULL, message TEXT NOT NULL, read INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)',
     []

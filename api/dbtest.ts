@@ -9,7 +9,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const db = createDbClient();
+    const db = await createDbClient();
     const result = await db.execute('SELECT 1', []);
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');

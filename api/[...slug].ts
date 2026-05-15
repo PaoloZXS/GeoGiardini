@@ -23,7 +23,7 @@ export default async function handler(req: any, res: any) {
   const method = (req.method || 'GET').toUpperCase();
 
   try {
-    const db = createDbClient();
+    const db = await createDbClient();
 
     if (path === '/login' && method === 'POST') {
       const { role, username, code } = req.body ?? {};

@@ -1650,7 +1650,7 @@ function AdminPage() {
                               handleSelectAttivita(item);
                             }
                           }}
-                          className="flex items-center justify-between rounded-xl p-2 transition bg-emerald-100 hover:bg-emerald-200"
+                          className="flex items-center justify-between rounded-xl border border-outline-variant p-2 transition bg-white hover:bg-surface-container-high"
                         >
                           <div className="min-w-0 flex-1">
                             <p className="font-label-lg text-label-lg truncate text-on-surface">

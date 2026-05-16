@@ -1611,7 +1611,7 @@ function AdminPage() {
                 onSubmit={handleSaveAttivita}
               >
                 <div className="space-y-2">
-                  <label className="font-label-lg text-label-lg admin-page__modal-label font-bold block">
+                  <label className="font-label-lg text-label-lg admin-page__modal-label font-bold block pl-2">
                     Descrizione Attività
                   </label>
                   <input
@@ -1627,7 +1627,7 @@ function AdminPage() {
 
                 <div className="flex-1 min-h-0 overflow-hidden">
                   <div className="mb-3 space-y-2">
-                    <p className="font-label-lg text-label-lg admin-page__modal-label italic font-bold">
+                    <p className="font-label-lg text-label-lg admin-page__modal-label italic font-bold pl-2">
                       Attività inserite:{" "}
                       <span className="font-bold">{attivitaList.length}</span>
                     </p>

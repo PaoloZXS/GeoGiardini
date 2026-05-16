@@ -1019,7 +1019,7 @@ function AdminPage() {
           >
             park
           </span>
-          <h1 className="font-headline-lg text-headline-lg text-on-primary tracking-tight admin-page__title">
+          <h1 className="font-headline-lg text-headline-lg tracking-tight admin-page__title">
             GeoGiardini
           </h1>
         </div>
@@ -1083,7 +1083,7 @@ function AdminPage() {
 
       <main className="flex-1 flex flex-col max-w-[720px] mx-auto w-full px-edge-margin overflow-hidden py-md">
         <section className="mb-md shrink-0">
-          <h2 className="font-headline-md text-headline-md text-on-primary leading-tight admin-page__welcome">
+          <h2 className="font-headline-md text-headline-md leading-tight admin-page__welcome">
             Benvenuto, Angelo
           </h2>
         </section>
@@ -1743,7 +1743,7 @@ function AdminPage() {
                   <button
                     type="button"
                     onClick={() => openAvvisiModal("unread")}
-                    className="rounded-2xl border border-outline-variant p-3 text-left transition hover:border-primary"
+                    className="rounded-2xl border border-outline-variant p-3 text-left transition hover:border-primary min-h-[50px] flex flex-col justify-between"
                     style={{
                       background:
                         "linear-gradient(135deg, rgba(248, 113, 113, 1), rgba(185, 28, 28, 0.35))"
@@ -1759,7 +1759,7 @@ function AdminPage() {
                   <button
                     type="button"
                     onClick={() => openAvvisiModal("read")}
-                    className="rounded-2xl border border-outline-variant p-3 text-left transition hover:border-primary"
+                    className="rounded-2xl border border-outline-variant p-3 text-left transition hover:border-primary min-h-[50px] flex flex-col justify-between"
                     style={{
                       background:
                         "linear-gradient(135deg, rgba(255, 245, 207, 1), rgba(236, 179, 62, 1))"
@@ -1862,7 +1862,7 @@ function AdminPage() {
                       Messaggio per il Giardiniere
                     </label>
                     <textarea
-                      className="w-full min-h-[120px] resize-none bg-white border border-outline-variant rounded-lg px-3 py-2 font-body-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                      className="w-full min-h-[88px] resize-none bg-white border border-outline-variant rounded-lg px-3 py-2 font-body-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                       value={avvisiMessage}
                       onChange={(event) => setAvvisiMessage(event.target.value)}
                       placeholder="Scrivi qui il testo dell'avviso..."

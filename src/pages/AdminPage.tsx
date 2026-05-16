@@ -2446,7 +2446,7 @@ function AdminPage() {
                     Note per il giardiniere
                   </label>
                   <textarea
-                    className="h-28 w-full bg-surface-container-low border border-outline-variant rounded-xl p-md font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none transition-all"
+                    className="h-20 w-full bg-surface-container-low border border-outline-variant rounded-xl p-md font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none transition-all"
                     placeholder="Dettagli aggiuntivi o istruzioni speciali..."
                     value={appuntamentoNote}
                     onChange={(event) =>

@@ -350,13 +350,29 @@ export default async function handler(req: any, res: any) {
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify({ success: true }));
   } catch (error: any) {
-    console.error("Appuntamenti API error", error, { body: req.body });
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json");
     const errorMessage =
       error && typeof error === "object" && "message" in error
         ? String(error.message)
         : String(error || "Errore interno del server.");
-    res.end(JSON.stringify({ success: false, message: errorMessage }));
+    console.error("Appuntamenti API error", {
+      error,
+      body: req.body,
+      errorMessage
+    });
+    res.statusCode = 500;
+    res.setHeader("Content-Type", "application/json");
+    res.end(
+      JSON.stringify({
+        success: false,
+        message: `Errore interno del server: ${errorMessage}. Richiesta: ${JSON.stringify(
+          {
+            data: req.body?.data,
+            clienteId: req.body?.clienteId,
+            giardinieriIds: req.body?.giardinieriIds,
+            attivita: req.body?.attivita
+          }
+        )}`
+      })
+    );
   }
 }

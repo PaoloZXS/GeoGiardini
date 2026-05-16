@@ -633,14 +633,25 @@ async function startServer() {
 
       return res.json({ success: true });
     } catch (error) {
-      console.error("Saving appuntamento failed", error);
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Errore interno del server durante il salvataggio dell'appuntamento.";
+          : String(error || "Errore interno del server.");
+      console.error("Saving appuntamento failed", {
+        error,
+        body: req.body,
+        errorMessage
+      });
       return res.status(500).json({
         success: false,
-        message: errorMessage
+        message: `Errore interno del server: ${errorMessage}. Richiesta: ${JSON.stringify(
+          {
+            data: req.body?.data,
+            clienteId: req.body?.clienteId,
+            giardinieriIds: req.body?.giardinieriIds,
+            attivita: req.body?.attivita
+          }
+        )}`
       });
     }
   });

@@ -513,7 +513,7 @@ function AdminPage() {
         const message =
           result?.message ||
           `Errore durante il salvataggio dell'appuntamento. (${response.status} ${response.statusText})`;
-        throw new Error(message);
+        throw new Error(`Errore PWA: ${message}`);
       }
 
       setStatusType("success");

@@ -1004,7 +1004,7 @@ function AdminPage() {
 
   return (
     <div className="bg-background text-on-surface h-screen flex flex-col overflow-hidden admin-page-root">
-      <header className="w-full shrink-0 bg-transparent dark:bg-transparent flex items-center justify-between px-edge-margin py-sm h-touch-target-min border-b border-outline-variant z-40">
+      <header className="w-full shrink-0 bg-transparent dark:bg-transparent flex items-center justify-between px-edge-margin py-sm h-touch-target-min z-40">
         <div className="flex items-center gap-sm">
           <span
             className="material-symbols-outlined admin-page__brand-icon text-primary dark:text-primary-fixed-dim"
@@ -1012,7 +1012,7 @@ function AdminPage() {
           >
             park
           </span>
-          <h1 className="font-headline-lg text-headline-lg text-on-primary tracking-tight">
+          <h1 className="font-headline-lg text-headline-lg text-on-primary tracking-tight admin-page__title">
             GeoGiardini
           </h1>
         </div>
@@ -1031,6 +1031,7 @@ function AdminPage() {
           </button>
         </div>
       </header>
+      <div className="admin-page__divider" />
 
       {statusMessage && (
         <div className={statusBoxClasses} role="status" aria-live="polite">
@@ -1075,7 +1076,7 @@ function AdminPage() {
 
       <main className="flex-1 flex flex-col max-w-[720px] mx-auto w-full px-edge-margin overflow-hidden py-md">
         <section className="mb-md shrink-0">
-          <h2 className="font-headline-md text-headline-md text-on-primary leading-tight">
+          <h2 className="font-headline-md text-headline-md text-on-primary leading-tight admin-page__welcome">
             Benvenuto, Angelo
           </h2>
         </section>
@@ -1201,19 +1202,19 @@ function AdminPage() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <span
-                  className="material-symbols-outlined text-white text-3xl"
+                  className="material-symbols-outlined admin-page__modal-heading-icon text-3xl"
                   data-icon="person_add"
                 >
                   person_add
                 </span>
-                <h3 className="font-label-lg text-xl font-semibold text-white">
+                <h3 className="font-label-lg text-xl font-semibold admin-page__modal-heading">
                   {editingGiardiniereId
                     ? "Modifica Giardiniere"
                     : "Nuovo Giardiniere"}
                 </h3>
                 <button
                   type="button"
-                  className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-black text-3xl leading-none shadow-sm hover:bg-surface-container-high focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary text-3xl leading-none shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary"
                   onClick={handleClearGiardiniereForm}
                   aria-label="Nuovo giardiniere"
                 >
@@ -1227,7 +1228,7 @@ function AdminPage() {
                 onSubmit={handleSave}
               >
                 <div className="space-y-2">
-                  <label className="font-label-lg text-label-lg text-white font-bold block pl-2">
+                  <label className="font-label-lg text-label-lg admin-page__modal-label font-bold block pl-2">
                     Username
                   </label>
                   <input
@@ -1240,7 +1241,7 @@ function AdminPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="font-label-sm text-label-sm text-white font-bold block pl-2">
+                  <label className="font-label-sm text-label-sm admin-page__modal-label font-bold block pl-2">
                     Codice
                   </label>
                   <input
@@ -1250,7 +1251,7 @@ function AdminPage() {
                     value={codice}
                     onChange={(event) => setCodice(event.target.value)}
                   />
-                  <div className="mt-2 pl-2 flex items-center gap-2 text-sm font-bold text-white whitespace-nowrap">
+                  <div className="mt-2 pl-2 flex items-center gap-2 text-sm font-bold admin-page__modal-label whitespace-nowrap">
                     <label className="inline-flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -1267,7 +1268,7 @@ function AdminPage() {
 
                 <div className="flex-1 min-h-0 overflow-hidden">
                   <div className="mb-1">
-                    <p className="pl-2 font-label-lg text-label-lg text-white italic font-bold">
+                    <p className="pl-2 font-label-lg text-label-lg admin-page__modal-label italic font-bold">
                       Giardinieri registrati :{" "}
                       <span className="font-bold">
                         {giardinieriList.length}
@@ -1386,21 +1387,23 @@ function AdminPage() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <span
-                  className="material-symbols-outlined text-white text-3xl"
+                  className="material-symbols-outlined admin-page__modal-heading-icon text-3xl"
                   data-icon="groups"
                 >
                   groups
                 </span>
-                <h3 className="font-label-lg text-xl font-semibold text-white">
+                <h3 className="font-label-lg text-xl font-semibold admin-page__modal-heading">
                   {editingClienteId ? "Modifica Cliente" : "Nuovo Cliente"}
                 </h3>
                 <button
                   type="button"
-                  className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-sm hover:bg-surface-container-high focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary"
                   onClick={handleClearClienteForm}
                   aria-label="Nuovo cliente"
                 >
-                  +
+                  <span className="material-symbols-outlined text-[22px] leading-none">
+                    cleaning_services
+                  </span>
                 </button>
               </div>
               <form
@@ -1408,7 +1411,7 @@ function AdminPage() {
                 onSubmit={handleSaveCliente}
               >
                 <div className="space-y-2">
-                  <label className="pl-2 font-label-lg text-label-lg text-white font-bold block">
+                  <label className="pl-2 font-label-lg text-label-lg admin-page__modal-label font-bold block">
                     Nome Cliente
                   </label>
                   <input
@@ -1421,7 +1424,7 @@ function AdminPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="pl-2 font-label-lg text-label-lg text-white font-bold block">
+                  <label className="pl-2 font-label-lg text-label-lg admin-page__modal-label font-bold block">
                     Indirizzo
                   </label>
                   <input
@@ -1436,7 +1439,7 @@ function AdminPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="pl-2 font-label-sm text-label-sm text-white font-bold block">
+                    <label className="pl-2 font-label-sm text-label-sm admin-page__modal-label font-bold block">
                       Codice
                     </label>
                     <input
@@ -1448,7 +1451,7 @@ function AdminPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="pl-2 font-label-sm text-label-sm text-white font-bold block">
+                    <label className="pl-2 font-label-sm text-label-sm admin-page__modal-label font-bold block">
                       Telefono
                     </label>
                     <input
@@ -1462,7 +1465,7 @@ function AdminPage() {
                     />
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm font-bold text-white mt-2 pl-2">
+                <div className="flex items-center gap-2 text-sm font-bold admin-page__modal-label mt-2 pl-2">
                   <label className="inline-flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -1478,7 +1481,7 @@ function AdminPage() {
 
                 <div className="flex-1 min-h-0 overflow-hidden">
                   <div className="mb-1">
-                    <p className="pl-2 font-label-lg text-label-lg text-white italic font-bold">
+                    <p className="pl-2 font-label-lg text-label-lg admin-page__modal-label italic font-bold">
                       Clienti registrati:{" "}
                       <span className="font-bold">{clientiCount}</span>
                     </p>
@@ -1501,35 +1504,23 @@ function AdminPage() {
                               handleSelectCliente(cliente);
                             }
                           }}
-                          className={`w-full rounded-xl border p-3 text-left transition ${
+                          className={`w-full rounded-xl border p-0.5 text-left transition ${
                             editingClienteId === cliente.id
                               ? "border-primary bg-primary/10"
                               : "border-outline-variant bg-surface-container-lowest hover:bg-surface-container-high"
                           }`}
                         >
-                          <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">
                               <p
                                 className={`font-label-lg text-label-lg truncate ${cliente.attivo ? "text-on-surface" : "text-error line-through decoration-red-500 decoration-2"}`}
                               >
                                 {cliente.nome}
                               </p>
-                              <p
-                                className={`text-sm truncate ${cliente.attivo ? "text-on-surface-variant" : "text-error line-through decoration-red-500 decoration-2"}`}
-                              >
-                                {cliente.indirizzo}
-                              </p>
-                              {cliente.codice ? (
-                                <p
-                                  className={`text-sm truncate ${cliente.attivo ? "text-on-surface-variant" : "text-error line-through decoration-red-500 decoration-2"}`}
-                                >
-                                  Codice: {cliente.codice}
-                                </p>
-                              ) : null}
                             </div>
                             <button
                               type="button"
-                              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-error/10 text-error hover:bg-error/20 transition-colors"
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-error/10 text-error hover:bg-error/20 transition-colors"
                               onClick={(event) => {
                                 event.stopPropagation();
                                 openDeleteConfirmation(

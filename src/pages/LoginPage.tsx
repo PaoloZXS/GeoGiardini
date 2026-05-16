@@ -254,7 +254,7 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
               <button
                 key={role}
                 type="button"
-                className={`h-11 flex-1 rounded-full border px-4 text-sm font-bold transition ${
+                className={`login-page__role-button h-11 flex-1 rounded-full border px-4 text-sm font-bold transition ${
                   loginRole === role
                     ? "border-primary bg-primary text-on-primary"
                     : "border-outline-variant bg-surface text-on-surface hover:bg-surface-container-high"

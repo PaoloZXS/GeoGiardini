@@ -330,7 +330,7 @@ export default async function handler(req: any, res: any) {
     const notificationTitle = `Nuovo appuntamento per ${clienteNome}`;
     const notificationMessage = `Cliente : ${clienteNome}\nAttivita da svolgere : ${selectedAttivita.join(", ")}\nData Appuntamento : ${formattedDate}`;
 
-    for (const giardiniereId of selectedGiardiniieri) {
+    for (const giardiniereId of selectedGiardinieri) {
       await db.execute(
         "INSERT INTO notifiche (id, giardiniere_id, cliente_id, appuntamento_id, title, message, read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         [

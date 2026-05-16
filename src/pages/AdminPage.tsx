@@ -511,7 +511,8 @@ function AdminPage() {
       const result = await response.json().catch(() => null);
       if (!response.ok) {
         const message =
-          result?.message || "Errore durante il salvataggio dell'appuntamento.";
+          result?.message ||
+          `Errore durante il salvataggio dell'appuntamento. (${response.status} ${response.statusText})`;
         throw new Error(message);
       }
 
@@ -522,7 +523,11 @@ function AdminPage() {
     } catch (error) {
       console.error("Salvataggio appuntamento fallito", error);
       setStatusType("error");
-      setStatusMessage("Errore durante il salvataggio dell'appuntamento.");
+      setStatusMessage(
+        error instanceof Error
+          ? error.message
+          : "Errore durante il salvataggio dell'appuntamento."
+      );
       clearStatusAfterDelay();
     } finally {
       setIsSaving(false);

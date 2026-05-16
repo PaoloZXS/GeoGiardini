@@ -2020,13 +2020,21 @@ function AdminPage() {
                                         )
                                         .trim()
                                     : "";
+                                  const clientFromMessageMatch =
+                                    avviso.message?.match(
+                                      /^Cliente\s*:\s*(.+)$/im
+                                    );
+                                  const messageClienteName =
+                                    clientFromMessageMatch?.[1]?.trim();
                                   const createdAt = new Date(avviso.created_at);
                                   const dateOnly =
                                     createdAt.toLocaleDateString("it-IT");
                                   const selected =
                                     selectedAvvisoId === avviso.id;
                                   const clienteName =
-                                    avviso.cliente_nome || titleValue;
+                                    avviso.cliente_nome ||
+                                    messageClienteName ||
+                                    titleValue;
 
                                   return (
                                     <button
@@ -2102,28 +2110,67 @@ function AdminPage() {
                                   : "";
                               const rawMessage = avviso.message || "";
                               const clientFromMessageMatch =
-                                rawMessage.match(/^Cliente\s*:\s*(.+)$/m);
+                                rawMessage.match(/^Cliente\s*:\s*(.+)$/im);
                               const messageClientName =
                                 clientFromMessageMatch?.[1]?.trim();
                               const clienteName =
                                 messageClientName ||
                                 avviso.cliente_nome ||
                                 titleValue;
-                              const activityLabel = rawMessage
-                                .replace(
-                                  /^Hai un nuovo appuntamento il\s*\d{4}-\d{2}-\d{2}:?\s*/i,
-                                  ""
-                                )
-                                .trim()
-                                .replace(/[.。]+$/, "")
-                                .trim();
-                              const notificationText = isAppointmentNotification
-                                ? activityLabel
-                                : isAvvisoNotification
-                                  ? rawMessage
-                                      .replace(/^[\s\S]*?Messaggio\s*:\s*/i, "")
-                                      .trim()
-                                  : rawMessage;
+
+                              const appointmentMatch = rawMessage.match(
+                                /^Hai un nuovo appuntamento il\s*\d{4}-\d{2}-\d{2}:?\s*(.*)$/i
+                              );
+                              const appointmentActivity = appointmentMatch
+                                ? appointmentMatch[1]
+                                    .trim()
+                                    .replace(/[.。]+$/, "")
+                                    .trim()
+                                : "";
+
+                              const activityMatch = rawMessage.match(
+                                /^Attivit[àa]?\s*(?:da svolgere)?\s*:\s*([\s\S]+)$/im
+                              );
+                              const activityDetail =
+                                appointmentActivity ||
+                                activityMatch?.[1]
+                                  ?.trim()
+                                  .replace(/[.。]+$/, "") ||
+                                "";
+
+                              const appointmentDatePattern =
+                                /\s*Data Appuntamento\s*:\s*[\d/\-]+\s*/gi;
+
+                              const cleanText = (text: string) =>
+                                text
+                                  .replace(/^Cliente\s*:\s*.+$/gim, "")
+                                  .replace(/^[\s\S]*?Messaggio\s*:\s*/i, "")
+                                  .replace(
+                                    /^Attivit[àa]?\s*(?:da svolgere)?\s*:\s*/gim,
+                                    ""
+                                  )
+                                  .replace(
+                                    /^Hai un nuovo appuntamento il\s*\d{4}-\d{2}-\d{2}:?\s*/i,
+                                    ""
+                                  )
+                                  .replace(appointmentDatePattern, "")
+                                  .trim()
+                                  .replace(/[.。]+$/, "")
+                                  .trim();
+
+                              const cleanedMessage = cleanText(rawMessage);
+                              const cleanedTitle = cleanText(
+                                avviso.title || ""
+                              );
+
+                              const cleanedActivityDetail =
+                                cleanText(activityDetail);
+
+                              const notificationText =
+                                cleanedMessage || cleanedTitle || "";
+                              const shouldShowNotificationText =
+                                notificationText &&
+                                notificationText !== cleanedActivityDetail;
                               const createdAt = new Date(avviso.created_at);
                               const dateOnly =
                                 createdAt.toLocaleDateString("it-IT");
@@ -2188,14 +2235,21 @@ function AdminPage() {
                                           avviso.giardiniere_id}
                                       </span>
                                     </p>
-                                    <p>
-                                      <span className="font-semibold text-on-surface">
-                                        Notifica inviata :
-                                      </span>{" "}
-                                      <span className="text-on-surface">
+                                    {shouldShowNotificationText ? (
+                                      <p className="text-on-surface">
                                         {notificationText}
-                                      </span>
-                                    </p>
+                                      </p>
+                                    ) : null}
+                                    {cleanedActivityDetail ? (
+                                      <p>
+                                        <span className="font-semibold text-on-surface">
+                                          Attività da svolgere :
+                                        </span>{" "}
+                                        <span className="text-on-surface">
+                                          {cleanedActivityDetail}
+                                        </span>
+                                      </p>
+                                    ) : null}
                                   </div>
                                 </>
                               );

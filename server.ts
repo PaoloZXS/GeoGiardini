@@ -1,44 +1,53 @@
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import { createClient } from '@libsql/client';
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import { createClient } from "@libsql/client";
 
-const databaseUrl = 'libsql://geogiardini-paolozxs.aws-eu-west-1.turso.io';
-const authToken = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzgwODIzMzgsImlkIjoiMDE5ZGZkOGItZWEwMS03NGI2LTkzNTUtZDgxNjI4YjEzMDlkIiwicmlkIjoiZjFjYTE4ZDktOTMxOS00MmFkLTg4NTEtNDFiODVlMTEzOTNiIn0.ZwsaKrGcqLR_THEJ9OUGCE8pOK8mRs7P8fuOhodrsDwIPrff5UVKA2oR6ePLNxRm0cpcmQmaIS1eSV7T0D16CA';
+const databaseUrl = "libsql://geogiardini-paolozxs.aws-eu-west-1.turso.io";
+const authToken =
+  "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzgwODIzMzgsImlkIjoiMDE5ZGZkOGItZWEwMS03NGI2LTkzNTUtZDgxNjI4YjEzMDlkIiwicmlkIjoiZjFjYTE4ZDktOTMxOS00MmFkLTg4NTEtNDFiODVlMTEzOTNiIn0.ZwsaKrGcqLR_THEJ9OUGCE8pOK8mRs7P8fuOhodrsDwIPrff5UVKA2oR6ePLNxRm0cpcmQmaIS1eSV7T0D16CA";
 
 async function startServer() {
   const db = createClient({
     url: databaseUrl,
-    authToken,
+    authToken
   });
 
   const app = express();
-  app.use(cors({ origin: ['http://localhost:4173', 'http://127.0.0.1:4173'] }));
+  app.use(cors({ origin: ["http://localhost:4173", "http://127.0.0.1:4173"] }));
   app.use(bodyParser.json());
 
-  app.post('/api/login', async (req, res) => {
+  app.post("/api/login", async (req, res) => {
     try {
       const { role, username, code } = req.body ?? {};
 
-      if (!['admin', 'giardiniere', 'cliente'].includes(role)) {
-        return res.status(400).json({ success: false, message: 'Ruolo di login non valido.' });
+      if (!["admin", "giardiniere", "cliente"].includes(role)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Ruolo di login non valido." });
       }
 
       if (!username || !code) {
-        return res.status(400).json({ success: false, message: 'Nome e codice sono obbligatori.' });
+        return res
+          .status(400)
+          .json({ success: false, message: "Nome e codice sono obbligatori." });
       }
 
-      if (role === 'admin') {
-        if (username === 'Angelo' && code === 'A2026') {
-          return res.status(200).json({ success: true, role: 'admin', username });
+      if (role === "admin") {
+        if (username === "Angelo" && code === "A2026") {
+          return res
+            .status(200)
+            .json({ success: true, role: "admin", username });
         }
-        return res.status(401).json({ success: false, message: 'Credenziali admin errate.' });
+        return res
+          .status(401)
+          .json({ success: false, message: "Credenziali admin errate." });
       }
 
       const query =
-        role === 'giardiniere'
-          ? 'SELECT id FROM giardinieri WHERE LOWER(username) = LOWER(?) AND codice = ? LIMIT 1'
-          : 'SELECT id FROM clienti WHERE LOWER(nome) = LOWER(?) AND codice = ? LIMIT 1';
+        role === "giardiniere"
+          ? "SELECT id FROM giardinieri WHERE LOWER(username) = LOWER(?) AND codice = ? LIMIT 1"
+          : "SELECT id FROM clienti WHERE LOWER(nome) = LOWER(?) AND codice = ? LIMIT 1";
 
       const result = await db.execute(query, [username.trim(), code.trim()]);
       const rows = Array.isArray(result.rows) ? result.rows : [];
@@ -46,9 +55,10 @@ async function startServer() {
       if (rows.length > 0) {
         const firstRow = rows[0] as any;
         const normalizeValue = (value: unknown) => {
-          if (typeof value === 'string') return value;
+          if (typeof value === "string") return value;
           if (value == null) return undefined;
-          if (typeof (value as any).toString === 'function') return (value as any).toString();
+          if (typeof (value as any).toString === "function")
+            return (value as any).toString();
           return undefined;
         };
 
@@ -58,26 +68,30 @@ async function startServer() {
           normalizeValue(firstRow?.Id) ??
           normalizeValue(Array.isArray(firstRow) ? firstRow[0] : undefined) ??
           normalizeValue(Object.values(firstRow)[0]) ??
-          '';
+          "";
 
-        console.log('login query rows', rows, 'userId', userId);
+        console.log("login query rows", rows, "userId", userId);
 
         return res.status(200).json({
           success: true,
           role,
           username,
-          id: userId,
+          id: userId
         });
       }
 
-      return res.status(401).json({ success: false, message: 'Credenziali errate.' });
+      return res
+        .status(401)
+        .json({ success: false, message: "Credenziali errate." });
     } catch (error) {
-      console.error('Login failed', error);
-      return res.status(500).json({ success: false, message: 'Errore interno del server.' });
+      console.error("Login failed", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Errore interno del server." });
     }
   });
 
-  const tableName = 'giardinieri';
+  const tableName = "giardinieri";
   async function ensureGiardinieriTable() {
     const existingTablesResult = await db.execute(
       "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('giardinieri', 'giardinieri_fix')",
@@ -87,26 +101,26 @@ async function startServer() {
       ? existingTablesResult.rows.map((row: any) => row[0]?.toString())
       : [];
 
-    const hasGiardinieri = existingTables.includes('giardinieri');
-    const hasFix = existingTables.includes('giardinieri_fix');
+    const hasGiardinieri = existingTables.includes("giardinieri");
+    const hasFix = existingTables.includes("giardinieri_fix");
 
     if (!hasGiardinieri) {
       await db.execute(
-        'CREATE TABLE giardinieri (id TEXT PRIMARY KEY, username TEXT NOT NULL, codice TEXT NOT NULL, created_at TEXT NOT NULL, attivo INTEGER NOT NULL DEFAULT 0)',
+        "CREATE TABLE giardinieri (id TEXT PRIMARY KEY, username TEXT NOT NULL, codice TEXT NOT NULL, created_at TEXT NOT NULL, attivo INTEGER NOT NULL DEFAULT 0)",
         []
       );
       if (hasFix) {
         await db.execute(
-          'INSERT OR IGNORE INTO giardinieri (id, username, codice, created_at) SELECT CAST(id AS TEXT), CAST(username AS TEXT), CAST(codice AS TEXT), CAST(created_at AS TEXT) FROM giardinieri_fix',
+          "INSERT OR IGNORE INTO giardinieri (id, username, codice, created_at) SELECT CAST(id AS TEXT), CAST(username AS TEXT), CAST(codice AS TEXT), CAST(created_at AS TEXT) FROM giardinieri_fix",
           []
         );
-        await db.execute('DROP TABLE IF EXISTS giardinieri_fix', []);
+        await db.execute("DROP TABLE IF EXISTS giardinieri_fix", []);
       }
       return;
     }
 
     if (hasFix) {
-      const tempTable = 'giardinieri_migration';
+      const tempTable = "giardinieri_migration";
       await db.execute(
         `CREATE TABLE IF NOT EXISTS ${tempTable} (id TEXT PRIMARY KEY, username TEXT NOT NULL, codice TEXT NOT NULL, created_at TEXT NOT NULL, attivo INTEGER NOT NULL DEFAULT 0)`,
         []
@@ -119,33 +133,50 @@ async function startServer() {
         `INSERT OR IGNORE INTO ${tempTable} (id, username, codice, created_at) SELECT CAST(id AS TEXT), CAST(username AS TEXT), CAST(codice AS TEXT), CAST(created_at AS TEXT) FROM giardinieri`,
         []
       );
-      await db.execute('DROP TABLE IF EXISTS giardinieri_fix', []);
-      await db.execute('DROP TABLE IF EXISTS giardinieri', []);
+      await db.execute("DROP TABLE IF EXISTS giardinieri_fix", []);
+      await db.execute("DROP TABLE IF EXISTS giardinieri", []);
+      await db.execute(`ALTER TABLE ${tempTable} RENAME TO giardinieri`, []);
+    }
+
+    const columnsResult = await db.execute(
+      "PRAGMA table_info('giardinieri')",
+      []
+    );
+    const columns = Array.isArray(columnsResult.rows)
+      ? columnsResult.rows.map(
+          (row: any) =>
+            row?.name?.toString() ??
+            row?.[1]?.toString() ??
+            Object.values(row)[1]?.toString()
+        )
+      : [];
+
+    if (!columns.includes("attivo")) {
       await db.execute(
-        `ALTER TABLE ${tempTable} RENAME TO giardinieri`,
+        "ALTER TABLE giardinieri ADD COLUMN attivo INTEGER NOT NULL DEFAULT 0",
         []
       );
     }
-
-    const columnsResult = await db.execute("PRAGMA table_info('giardinieri')", []);
-    const columns = Array.isArray(columnsResult.rows)
-      ? columnsResult.rows.map((row: any) => row?.name?.toString() ?? row?.[1]?.toString() ?? Object.values(row)[1]?.toString())
-      : [];
-
-    if (!columns.includes('attivo')) {
-      await db.execute('ALTER TABLE giardinieri ADD COLUMN attivo INTEGER NOT NULL DEFAULT 0', []);
-    }
   }
 
-  app.post('/api/giardinieri', async (req, res) => {
+  app.post("/api/giardinieri", async (req, res) => {
     try {
-      const { username, codice, attivo } = req.body as { username?: string; codice?: string; attivo?: boolean | number };
+      const { username, codice, attivo } = req.body as {
+        username?: string;
+        codice?: string;
+        attivo?: boolean | number;
+      };
       const trimmedUsername = username?.toString().trim();
       const trimmedCodice = codice?.toString().trim();
       const isActive = attivo ? 1 : 0;
 
       if (!trimmedUsername || !trimmedCodice) {
-        return res.status(400).json({ success: false, message: 'Username e codice sono obbligatori.' });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Username e codice sono obbligatori."
+          });
       }
 
       await ensureGiardinieriTable();
@@ -156,42 +187,73 @@ async function startServer() {
       );
 
       if (existing.rows.length > 0) {
-        return res.status(409).json({ success: false, message: 'Username già presente. Usa un altro username.' });
+        return res
+          .status(409)
+          .json({
+            success: false,
+            message: "Username già presente. Usa un altro username."
+          });
       }
 
       await db.execute(
         `INSERT INTO ${tableName} (id, username, codice, created_at, attivo) VALUES (?, ?, ?, ?, ?)`,
-        [crypto.randomUUID(), trimmedUsername, trimmedCodice, new Date().toISOString(), isActive]
+        [
+          crypto.randomUUID(),
+          trimmedUsername,
+          trimmedCodice,
+          new Date().toISOString(),
+          isActive
+        ]
       );
 
       return res.json({ success: true });
     } catch (error) {
-      console.error('Saving giardinieri failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante il salvataggio.' });
+      console.error("Saving giardinieri failed", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Errore durante il salvataggio." });
     }
   });
 
-  app.get('/api/giardinieri', async (req, res) => {
+  app.get("/api/giardinieri", async (req, res) => {
     try {
       await ensureGiardinieriTable();
-      const result = await db.execute('SELECT id, username, codice, created_at, attivo FROM giardinieri ORDER BY created_at DESC', []);
+      const result = await db.execute(
+        "SELECT id, username, codice, created_at, attivo FROM giardinieri ORDER BY created_at DESC",
+        []
+      );
       return res.json({ success: true, giardinieri: result.rows || [] });
     } catch (error) {
-      console.error('Fetching giardinieri failed', error);
-      return res.status(500).json({ success: false, giardinieri: [], message: 'Errore caricamento giardinieri.' });
+      console.error("Fetching giardinieri failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          giardinieri: [],
+          message: "Errore caricamento giardinieri."
+        });
     }
   });
 
-  app.put('/api/giardinieri/:id', async (req, res) => {
+  app.put("/api/giardinieri/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const { username, codice, attivo } = req.body as { username?: string; codice?: string; attivo?: boolean | number };
+      const { username, codice, attivo } = req.body as {
+        username?: string;
+        codice?: string;
+        attivo?: boolean | number;
+      };
       const trimmedUsername = username?.toString().trim();
       const trimmedCodice = codice?.toString().trim();
       const isActive = attivo ? 1 : 0;
 
       if (!trimmedUsername || !trimmedCodice) {
-        return res.status(400).json({ success: false, message: 'Username e codice sono obbligatori.' });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Username e codice sono obbligatori."
+          });
       }
 
       await ensureGiardinieriTable();
@@ -202,7 +264,12 @@ async function startServer() {
       );
 
       if (existing.rows.length > 0) {
-        return res.status(409).json({ success: false, message: 'Username già presente. Usa un altro username.' });
+        return res
+          .status(409)
+          .json({
+            success: false,
+            message: "Username già presente. Usa un altro username."
+          });
       }
 
       await db.execute(
@@ -212,12 +279,14 @@ async function startServer() {
 
       return res.json({ success: true });
     } catch (error) {
-      console.error('Updating giardiniere failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante l\'aggiornamento.' });
+      console.error("Updating giardiniere failed", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Errore durante l'aggiornamento." });
     }
   });
 
-  app.delete('/api/giardinieri/:id', async (req, res) => {
+  app.delete("/api/giardinieri/:id", async (req, res) => {
     try {
       const { id } = req.params as { id: string };
 
@@ -226,8 +295,10 @@ async function startServer() {
 
       return res.json({ success: true });
     } catch (error) {
-      console.error('Deleting giardiniere failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante l\'eliminazione.' });
+      console.error("Deleting giardiniere failed", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Errore durante l'eliminazione." });
     }
   });
 
@@ -237,26 +308,32 @@ async function startServer() {
       []
     );
 
-    const columnsResult = await db.execute(
-      "PRAGMA table_info('clienti')",
-      []
-    );
+    const columnsResult = await db.execute("PRAGMA table_info('clienti')", []);
     const columns = Array.isArray(columnsResult.rows)
-      ? columnsResult.rows.map((row: any) =>
-          row?.name?.toString() ?? row?.[1]?.toString() ?? Object.values(row)[1]?.toString()
+      ? columnsResult.rows.map(
+          (row: any) =>
+            row?.name?.toString() ??
+            row?.[1]?.toString() ??
+            Object.values(row)[1]?.toString()
         )
       : [];
 
-    if (!columns.includes('codice')) {
-      await db.execute('ALTER TABLE clienti ADD COLUMN codice TEXT NOT NULL DEFAULT ""', []);
+    if (!columns.includes("codice")) {
+      await db.execute(
+        'ALTER TABLE clienti ADD COLUMN codice TEXT NOT NULL DEFAULT ""',
+        []
+      );
     }
 
-    if (!columns.includes('attivo')) {
-      await db.execute('ALTER TABLE clienti ADD COLUMN attivo INTEGER NOT NULL DEFAULT 1', []);
+    if (!columns.includes("attivo")) {
+      await db.execute(
+        "ALTER TABLE clienti ADD COLUMN attivo INTEGER NOT NULL DEFAULT 1",
+        []
+      );
     }
   }
 
-  app.post('/api/clienti', async (req, res) => {
+  app.post("/api/clienti", async (req, res) => {
     try {
       const { nome, indirizzo, telefono, codice, attivo } = req.body as {
         nome?: string;
@@ -267,102 +344,165 @@ async function startServer() {
       };
       const trimmedNome = nome?.toString().trim();
       const trimmedIndirizzo = indirizzo?.toString().trim();
-      const trimmedTelefono = telefono?.toString().trim() ?? '';
+      const trimmedTelefono = telefono?.toString().trim() ?? "";
       const trimmedCodice = codice?.toString().trim();
       const isActive = attivo ? 1 : 0;
 
       if (!trimmedNome || !trimmedIndirizzo || !trimmedCodice) {
-        return res.status(400).json({ success: false, message: 'Nome, indirizzo e codice sono obbligatori.' });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Nome, indirizzo e codice sono obbligatori."
+          });
       }
 
       await ensureClientiTable();
 
       const existingClient = await db.execute(
-        'SELECT id FROM clienti WHERE LOWER(nome) = LOWER(?) LIMIT 1',
+        "SELECT id FROM clienti WHERE LOWER(nome) = LOWER(?) LIMIT 1",
         [trimmedNome]
       );
 
       if (existingClient.rows.length > 0) {
-        return res.status(409).json({ success: false, message: 'Cliente già presente. Usa un altro nome.' });
+        return res
+          .status(409)
+          .json({
+            success: false,
+            message: "Cliente già presente. Usa un altro nome."
+          });
       }
 
       await db.execute(
-        'INSERT INTO clienti (nome, indirizzo, telefono, codice, attivo) VALUES (?, ?, ?, ?, ?)',
-        [trimmedNome, trimmedIndirizzo, trimmedTelefono, trimmedCodice, isActive]
+        "INSERT INTO clienti (nome, indirizzo, telefono, codice, attivo) VALUES (?, ?, ?, ?, ?)",
+        [
+          trimmedNome,
+          trimmedIndirizzo,
+          trimmedTelefono,
+          trimmedCodice,
+          isActive
+        ]
       );
 
       return res.json({ success: true });
     } catch (error) {
-      console.error('Saving clienti failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante il salvataggio cliente.' });
+      console.error("Saving clienti failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Errore durante il salvataggio cliente."
+        });
     }
   });
 
-  app.get('/api/clienti', async (req, res) => {
+  app.get("/api/clienti", async (req, res) => {
     try {
       await ensureClientiTable();
-      const result = await db.execute('SELECT id, nome, indirizzo, telefono, codice, attivo FROM clienti ORDER BY id DESC', []);
+      const result = await db.execute(
+        "SELECT id, nome, indirizzo, telefono, codice, attivo FROM clienti ORDER BY id DESC",
+        []
+      );
       return res.json({ success: true, clienti: result.rows || [] });
     } catch (error) {
-      console.error('Fetching clienti failed', error);
-      return res.status(500).json({ success: false, clienti: [], message: 'Errore caricamento clienti.' });
+      console.error("Fetching clienti failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          clienti: [],
+          message: "Errore caricamento clienti."
+        });
     }
   });
 
-  app.put('/api/clienti/:id', async (req, res) => {
+  app.put("/api/clienti/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const { nome, indirizzo, telefono, codice, attivo } = req.body as { nome?: string; indirizzo?: string; telefono?: string; codice?: string; attivo?: boolean | number };
+      const { nome, indirizzo, telefono, codice, attivo } = req.body as {
+        nome?: string;
+        indirizzo?: string;
+        telefono?: string;
+        codice?: string;
+        attivo?: boolean | number;
+      };
       const trimmedNome = nome?.toString().trim();
       const trimmedIndirizzo = indirizzo?.toString().trim();
-      const trimmedTelefono = telefono?.toString().trim() ?? '';
+      const trimmedTelefono = telefono?.toString().trim() ?? "";
       const trimmedCodice = codice?.toString().trim();
       const isActive = attivo ? 1 : 0;
 
       if (!trimmedNome || !trimmedIndirizzo || !trimmedCodice) {
-        return res.status(400).json({ success: false, message: 'Nome, indirizzo e codice sono obbligatori.' });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Nome, indirizzo e codice sono obbligatori."
+          });
       }
 
       await ensureClientiTable();
 
       const existing = await db.execute(
-        'SELECT id FROM clienti WHERE LOWER(nome) = LOWER(?) AND id != ? LIMIT 1',
+        "SELECT id FROM clienti WHERE LOWER(nome) = LOWER(?) AND id != ? LIMIT 1",
         [trimmedNome, id]
       );
 
       if (existing.rows.length > 0) {
-        return res.status(409).json({ success: false, message: 'Cliente già presente. Usa un altro nome.' });
+        return res
+          .status(409)
+          .json({
+            success: false,
+            message: "Cliente già presente. Usa un altro nome."
+          });
       }
 
       await db.execute(
-        'UPDATE clienti SET nome = ?, indirizzo = ?, telefono = ?, codice = ?, attivo = ? WHERE id = ?',
-        [trimmedNome, trimmedIndirizzo, trimmedTelefono, trimmedCodice, isActive, id]
+        "UPDATE clienti SET nome = ?, indirizzo = ?, telefono = ?, codice = ?, attivo = ? WHERE id = ?",
+        [
+          trimmedNome,
+          trimmedIndirizzo,
+          trimmedTelefono,
+          trimmedCodice,
+          isActive,
+          id
+        ]
       );
 
       return res.json({ success: true });
     } catch (error) {
-      console.error('Updating cliente failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante l\'aggiornamento cliente.' });
+      console.error("Updating cliente failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Errore durante l'aggiornamento cliente."
+        });
     }
   });
 
-  app.delete('/api/clienti/:id', async (req, res) => {
+  app.delete("/api/clienti/:id", async (req, res) => {
     try {
       const { id } = req.params as { id: string };
 
       await ensureClientiTable();
-      await db.execute('DELETE FROM clienti WHERE id = ?', [id]);
+      await db.execute("DELETE FROM clienti WHERE id = ?", [id]);
 
       return res.json({ success: true });
     } catch (error) {
-      console.error('Deleting cliente failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante l\'eliminazione cliente.' });
+      console.error("Deleting cliente failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Errore durante l'eliminazione cliente."
+        });
     }
   });
 
   async function ensureAttivitaTable() {
     await db.execute(
-      'CREATE TABLE IF NOT EXISTS attivita (id TEXT PRIMARY KEY, description TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)',
+      "CREATE TABLE IF NOT EXISTS attivita (id TEXT PRIMARY KEY, description TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)",
       []
     );
   }
@@ -376,44 +516,54 @@ async function startServer() {
 
   async function ensureAppuntamentoGiardinieriTable() {
     await db.execute(
-      'CREATE TABLE IF NOT EXISTS appuntamento_giardinieri (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, giardiniere_id TEXT NOT NULL, UNIQUE(appuntamento_id, giardiniere_id))',
+      "CREATE TABLE IF NOT EXISTS appuntamento_giardinieri (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, giardiniere_id TEXT NOT NULL, UNIQUE(appuntamento_id, giardiniere_id))",
       []
     );
   }
 
   async function ensureAppuntamentoAttivitaTable() {
     await db.execute(
-      'CREATE TABLE IF NOT EXISTS appuntamento_attivita (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, description TEXT NOT NULL)',
+      "CREATE TABLE IF NOT EXISTS appuntamento_attivita (id TEXT PRIMARY KEY, appuntamento_id TEXT NOT NULL, description TEXT NOT NULL)",
       []
     );
   }
 
   async function ensureNotificheTable() {
     await db.execute(
-      'CREATE TABLE IF NOT EXISTS notifiche (id TEXT PRIMARY KEY, giardiniere_id TEXT NOT NULL, appuntamento_id TEXT NOT NULL, cliente_id TEXT, title TEXT NOT NULL, message TEXT NOT NULL, read INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)',
+      "CREATE TABLE IF NOT EXISTS notifiche (id TEXT PRIMARY KEY, giardiniere_id TEXT NOT NULL, appuntamento_id TEXT NOT NULL, cliente_id TEXT, title TEXT NOT NULL, message TEXT NOT NULL, read INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)",
       []
     );
 
-    const columnsResult = await db.execute("PRAGMA table_info('notifiche')", []);
+    const columnsResult = await db.execute(
+      "PRAGMA table_info('notifiche')",
+      []
+    );
     const rows = Array.isArray(columnsResult.rows) ? columnsResult.rows : [];
     const hasClienteId = rows.some((row: any) => {
       const colName = row?.name?.toString?.().toLowerCase?.();
-      return colName === 'cliente_id';
+      return colName === "cliente_id";
     });
 
     if (!hasClienteId) {
       try {
-        await db.execute('ALTER TABLE notifiche ADD COLUMN cliente_id TEXT', []);
+        await db.execute(
+          "ALTER TABLE notifiche ADD COLUMN cliente_id TEXT",
+          []
+        );
       } catch (error) {
-        const message = error instanceof Error ? error.message.toLowerCase() : '';
-        if (!message.includes('duplicate column name') && !message.includes('already exists')) {
+        const message =
+          error instanceof Error ? error.message.toLowerCase() : "";
+        if (
+          !message.includes("duplicate column name") &&
+          !message.includes("already exists")
+        ) {
           throw error;
         }
       }
     }
   }
 
-  app.post('/api/appuntamenti', async (req, res) => {
+  app.post("/api/appuntamenti", async (req, res) => {
     try {
       const { data, clienteId, giardinieriIds, attivita, note } = req.body as {
         data?: string;
@@ -425,15 +575,26 @@ async function startServer() {
       const trimmedData = data?.toString().trim();
       const trimmedClienteId = clienteId?.toString().trim();
       const selectedGiardinieri = Array.isArray(giardinieriIds)
-        ? giardinieriIds.map((item) => item?.toString().trim()).filter((item) => item)
+        ? giardinieriIds
+            .map((item) => item?.toString().trim())
+            .filter((item) => item)
         : [];
       const selectedAttivita = Array.isArray(attivita)
         ? attivita.map((item) => item?.toString().trim()).filter((item) => item)
         : [];
-      const noteText = note?.toString().trim() ?? '';
+      const noteText = note?.toString().trim() ?? "";
 
-      if (!trimmedData || !trimmedClienteId || selectedGiardinieri.length === 0) {
-        return res.status(400).json({ success: false, message: 'Data, cliente e almeno un giardiniere sono obbligatori.' });
+      if (
+        !trimmedData ||
+        !trimmedClienteId ||
+        selectedGiardinieri.length === 0
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Data, cliente e almeno un giardiniere sono obbligatori."
+          });
       }
 
       await ensureClientiTable();
@@ -443,49 +604,74 @@ async function startServer() {
       await ensureAppuntamentoAttivitaTable();
       await ensureNotificheTable();
 
-      const clientResult = await db.execute('SELECT nome FROM clienti WHERE id = ? LIMIT 1', [trimmedClienteId]);
-      const clientRows = Array.isArray(clientResult.rows) ? clientResult.rows : [];
-      const clienteNome = clientRows[0]?.nome?.toString?.() ?? 'cliente';
+      const clientResult = await db.execute(
+        "SELECT nome FROM clienti WHERE id = ? LIMIT 1",
+        [trimmedClienteId]
+      );
+      const clientRows = Array.isArray(clientResult.rows)
+        ? clientResult.rows
+        : [];
+      const clienteNome = clientRows[0]?.nome?.toString?.() ?? "cliente";
 
       const appointmentId = crypto.randomUUID();
       await db.execute(
-        'INSERT INTO appuntamenti (id, data, cliente_id, note, created_at) VALUES (?, ?, ?, ?, ?)',
-        [appointmentId, trimmedData, trimmedClienteId, noteText, new Date().toISOString()]
+        "INSERT INTO appuntamenti (id, data, cliente_id, note, created_at) VALUES (?, ?, ?, ?, ?)",
+        [
+          appointmentId,
+          trimmedData,
+          trimmedClienteId,
+          noteText,
+          new Date().toISOString()
+        ]
       );
 
       for (const giardiniereId of selectedGiardinieri) {
         await db.execute(
-          'INSERT INTO appuntamento_giardinieri (id, appuntamento_id, giardiniere_id) VALUES (?, ?, ?)',
+          "INSERT INTO appuntamento_giardinieri (id, appuntamento_id, giardiniere_id) VALUES (?, ?, ?)",
           [crypto.randomUUID(), appointmentId, giardiniereId]
         );
       }
 
       for (const activity of selectedAttivita) {
         await db.execute(
-          'INSERT INTO appuntamento_attivita (id, appuntamento_id, description) VALUES (?, ?, ?)',
+          "INSERT INTO appuntamento_attivita (id, appuntamento_id, description) VALUES (?, ?, ?)",
           [crypto.randomUUID(), appointmentId, activity]
         );
       }
 
-      const formattedDate = new Date(trimmedData).toLocaleDateString('it-IT');
-      const notificationTitle = 'Appuntamento da :';
-      const notificationMessage = `Cliente : ${clienteNome}\nAttività da svolgere : ${selectedAttivita.join(', ')}\nData Appuntamento : ${formattedDate}`;
+      const formattedDate = new Date(trimmedData).toLocaleDateString("it-IT");
+      const notificationTitle = `Nuovo appuntamento per ${clienteNome}`;
+      const notificationMessage = `Cliente : ${clienteNome}\nAttività da svolgere : ${selectedAttivita.join(", ")}\nData Appuntamento : ${formattedDate}`;
 
       for (const giardiniereId of selectedGiardinieri) {
         await db.execute(
-          'INSERT INTO notifiche (id, giardiniere_id, appuntamento_id, title, message, read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [crypto.randomUUID(), giardiniereId, appointmentId, notificationTitle, notificationMessage, 0, new Date().toISOString()]
+          "INSERT INTO notifiche (id, giardiniere_id, cliente_id, appuntamento_id, title, message, read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          [
+            crypto.randomUUID(),
+            giardiniereId,
+            trimmedClienteId,
+            appointmentId,
+            notificationTitle,
+            notificationMessage,
+            0,
+            new Date().toISOString()
+          ]
         );
       }
 
       return res.json({ success: true });
     } catch (error) {
-      console.error('Saving appuntamento failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante il salvataggio dell\'appuntamento.' });
+      console.error("Saving appuntamento failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Errore durante il salvataggio dell'appuntamento."
+        });
     }
   });
 
-  app.get('/api/appuntamenti', async (req, res) => {
+  app.get("/api/appuntamenti", async (req, res) => {
     try {
       await ensureAppuntamentiTable();
       await ensureAppuntamentoGiardinieriTable();
@@ -500,15 +686,17 @@ async function startServer() {
       const params: any[] = [];
 
       if (giardiniereId) {
-        whereClauses.push('ag.giardiniere_id = ?');
+        whereClauses.push("ag.giardiniere_id = ?");
         params.push(giardiniereId);
       }
       if (clienteId) {
-        whereClauses.push('a.cliente_id = ?');
+        whereClauses.push("a.cliente_id = ?");
         params.push(clienteId);
       }
 
-      const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+      const whereSql = whereClauses.length
+        ? `WHERE ${whereClauses.join(" AND ")}`
+        : "";
 
       const result = await db.execute(
         `SELECT
@@ -541,13 +729,13 @@ async function startServer() {
         if (!appointmentsMap.has(appointmentId)) {
           appointmentsMap.set(appointmentId, {
             id: appointmentId,
-            data: row?.appointment_date ?? '',
-            clienteId: row?.cliente_id ?? '',
-            clienteNome: row?.cliente_nome ?? '',
-            note: row?.appointment_note ?? '',
-            createdAt: row?.appointment_created_at ?? '',
+            data: row?.appointment_date ?? "",
+            clienteId: row?.cliente_id ?? "",
+            clienteNome: row?.cliente_nome ?? "",
+            note: row?.appointment_note ?? "",
+            createdAt: row?.appointment_created_at ?? "",
             giardinieri: [],
-            attivita: [],
+            attivita: []
           });
         }
 
@@ -556,25 +744,44 @@ async function startServer() {
         const giardiniereIdValue = row?.giardiniere_id?.toString();
         const giardiniereUsernameValue = row?.giardiniere_username?.toString();
         if (giardiniereIdValue && giardiniereUsernameValue) {
-          if (!appointment.giardinieri.some((item: any) => item.id === giardiniereIdValue)) {
-            appointment.giardinieri.push({ id: giardiniereIdValue, username: giardiniereUsernameValue });
+          if (
+            !appointment.giardinieri.some(
+              (item: any) => item.id === giardiniereIdValue
+            )
+          ) {
+            appointment.giardinieri.push({
+              id: giardiniereIdValue,
+              username: giardiniereUsernameValue
+            });
           }
         }
 
         const activityDescription = row?.activity_description?.toString();
-        if (activityDescription && !appointment.attivita.includes(activityDescription)) {
+        if (
+          activityDescription &&
+          !appointment.attivita.includes(activityDescription)
+        ) {
           appointment.attivita.push(activityDescription);
         }
       }
 
-      return res.json({ success: true, appointments: Array.from(appointmentsMap.values()) });
+      return res.json({
+        success: true,
+        appointments: Array.from(appointmentsMap.values())
+      });
     } catch (error) {
-      console.error('Fetching appuntamenti failed', error);
-      return res.status(500).json({ success: false, appointments: [], message: 'Errore caricamento appuntamenti.' });
+      console.error("Fetching appuntamenti failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          appointments: [],
+          message: "Errore caricamento appuntamenti."
+        });
     }
   });
 
-  app.get('/api/notifiche', async (req, res) => {
+  app.get("/api/notifiche", async (req, res) => {
     try {
       await ensureNotificheTable();
       const giardiniereId = req.query.giardiniereId?.toString()?.trim();
@@ -584,17 +791,19 @@ async function startServer() {
       const params: any[] = [];
 
       if (giardiniereId) {
-        whereClauses.push('n.giardiniere_id = ?');
+        whereClauses.push("n.giardiniere_id = ?");
         params.push(giardiniereId);
       }
 
-      if (readFilter === '0' || readFilter === 'false') {
-        whereClauses.push('n.read = 0');
-      } else if (readFilter === '1' || readFilter === 'true') {
-        whereClauses.push('n.read = 1');
+      if (readFilter === "0" || readFilter === "false") {
+        whereClauses.push("n.read = 0");
+      } else if (readFilter === "1" || readFilter === "true") {
+        whereClauses.push("n.read = 1");
       }
 
-      const whereSql = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+      const whereSql = whereClauses.length
+        ? `WHERE ${whereClauses.join(" AND ")}`
+        : "";
       const result = await db.execute(
         `SELECT n.id, n.giardiniere_id, gi.username AS giardiniere_username, n.appuntamento_id, n.cliente_id, c.nome AS cliente_nome, n.title, n.message, n.read, n.created_at FROM notifiche n LEFT JOIN giardinieri gi ON gi.id = n.giardiniere_id LEFT JOIN clienti c ON c.id = n.cliente_id ${whereSql} ORDER BY n.created_at DESC`,
         params
@@ -603,12 +812,18 @@ async function startServer() {
       const rows = Array.isArray(result.rows) ? result.rows : [];
       return res.json({ success: true, notifiche: rows });
     } catch (error) {
-      console.error('Fetching notifiche failed', error);
-      return res.status(500).json({ success: false, notifiche: [], message: 'Errore caricamento notifiche.' });
+      console.error("Fetching notifiche failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          notifiche: [],
+          message: "Errore caricamento notifiche."
+        });
     }
   });
 
-  app.post('/api/notifiche', async (req, res) => {
+  app.post("/api/notifiche", async (req, res) => {
     try {
       const { title, message, giardinieriIds, clienteId } = req.body as {
         title?: string;
@@ -617,15 +832,20 @@ async function startServer() {
         clienteId?: string | number;
       };
 
-      const trimmedTitle = title?.toString().trim() || 'Messaggio dall\' Amministratore';
+      const trimmedTitle =
+        title?.toString().trim() || "Messaggio dall' Amministratore";
       const trimmedMessage = message?.toString().trim();
       const trimmedClienteId = clienteId?.toString().trim();
       const selectedGiardinieri = Array.isArray(giardinieriIds)
-        ? giardinieriIds.map((item) => item?.toString().trim()).filter((item) => item)
+        ? giardinieriIds
+            .map((item) => item?.toString().trim())
+            .filter((item) => item)
         : [];
 
       if (!trimmedMessage) {
-        return res.status(400).json({ success: false, message: 'Messaggio è obbligatorio.' });
+        return res
+          .status(400)
+          .json({ success: false, message: "Messaggio è obbligatorio." });
       }
 
       await ensureGiardinieriTable();
@@ -633,88 +853,147 @@ async function startServer() {
 
       let recipients = selectedGiardinieri;
       if (recipients.length === 0) {
-        const giardinieriResult = await db.execute('SELECT id FROM giardinieri WHERE attivo = 1');
-        const giardinieriRows = Array.isArray(giardinieriResult.rows) ? giardinieriResult.rows : [];
-        recipients = giardinieriRows.map((row: any) => row?.id?.toString?.()).filter((id) => id);
+        const giardinieriResult = await db.execute(
+          "SELECT id FROM giardinieri WHERE attivo = 1"
+        );
+        const giardinieriRows = Array.isArray(giardinieriResult.rows)
+          ? giardinieriResult.rows
+          : [];
+        recipients = giardinieriRows
+          .map((row: any) => row?.id?.toString?.())
+          .filter((id) => id);
       }
 
       if (recipients.length === 0) {
-        return res.status(400).json({ success: false, message: 'Nessun giardiniere selezionato o attivo.' });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Nessun giardiniere selezionato o attivo."
+          });
       }
 
       const createdAt = new Date().toISOString();
       for (const giardiniereId of recipients) {
         await db.execute(
-          'INSERT INTO notifiche (id, giardiniere_id, appuntamento_id, cliente_id, title, message, read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [crypto.randomUUID(), giardiniereId, '', trimmedClienteId || null, trimmedTitle, trimmedMessage, 0, createdAt]
+          "INSERT INTO notifiche (id, giardiniere_id, appuntamento_id, cliente_id, title, message, read, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          [
+            crypto.randomUUID(),
+            giardiniereId,
+            "",
+            trimmedClienteId || null,
+            trimmedTitle,
+            trimmedMessage,
+            0,
+            createdAt
+          ]
         );
       }
 
       return res.json({ success: true });
     } catch (error) {
-      console.error('Creating notifiche failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante la creazione dell\'avviso.' });
+      console.error("Creating notifiche failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Errore durante la creazione dell'avviso."
+        });
     }
   });
 
-  app.put('/api/notifiche/:id/read', async (req, res) => {
+  app.put("/api/notifiche/:id/read", async (req, res) => {
     try {
       const { id } = req.params as { id: string };
       if (!id) {
-        return res.status(400).json({ success: false, message: 'Id notifica mancante.' });
+        return res
+          .status(400)
+          .json({ success: false, message: "Id notifica mancante." });
       }
 
       await ensureNotificheTable();
-      await db.execute('UPDATE notifiche SET read = 1 WHERE id = ?', [id]);
+      await db.execute("UPDATE notifiche SET read = 1 WHERE id = ?", [id]);
       return res.json({ success: true });
     } catch (error) {
-      console.error('Marking notification read failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante l\'aggiornamento della notifica.' });
+      console.error("Marking notification read failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Errore durante l'aggiornamento della notifica."
+        });
     }
   });
 
-  app.post('/api/attivita', async (req, res) => {
+  app.post("/api/attivita", async (req, res) => {
     try {
       const { description } = req.body as { description?: string };
       const trimmedDescription = description?.toString().trim();
 
       if (!trimmedDescription) {
-        return res.status(400).json({ success: false, message: 'La descrizione dell\'attività è obbligatoria.' });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "La descrizione dell'attività è obbligatoria."
+          });
       }
 
       await ensureAttivitaTable();
       await db.execute(
-        'INSERT INTO attivita (id, description, completed, created_at) VALUES (?, ?, ?, ?)',
+        "INSERT INTO attivita (id, description, completed, created_at) VALUES (?, ?, ?, ?)",
         [crypto.randomUUID(), trimmedDescription, 0, new Date().toISOString()]
       );
 
       return res.json({ success: true });
     } catch (error) {
-      console.error('Saving attivita failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante il salvataggio dell\'attività.' });
+      console.error("Saving attivita failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Errore durante il salvataggio dell'attività."
+        });
     }
   });
 
-  app.get('/api/attivita', async (req, res) => {
+  app.get("/api/attivita", async (req, res) => {
     try {
       await ensureAttivitaTable();
-      const result = await db.execute('SELECT id, description, completed, created_at FROM attivita ORDER BY LOWER(description) ASC', []);
+      const result = await db.execute(
+        "SELECT id, description, completed, created_at FROM attivita ORDER BY LOWER(description) ASC",
+        []
+      );
       return res.json({ success: true, attivita: result.rows || [] });
     } catch (error) {
-      console.error('Fetching attivita failed', error);
-      return res.status(500).json({ success: false, attivita: [], message: 'Errore caricamento attività.' });
+      console.error("Fetching attivita failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          attivita: [],
+          message: "Errore caricamento attività."
+        });
     }
   });
 
-  app.put('/api/attivita/:id', async (req, res) => {
+  app.put("/api/attivita/:id", async (req, res) => {
     try {
       const { id } = req.params as { id: string };
-      const { description, completed } = req.body as { description?: string; completed?: boolean | number };
+      const { description, completed } = req.body as {
+        description?: string;
+        completed?: boolean | number;
+      };
       const trimmedDescription = description?.toString().trim();
       const isCompleted = completed ? 1 : 0;
 
-      if (!id || (trimmedDescription === undefined && completed === undefined)) {
-        return res.status(400).json({ success: false, message: 'Dati attività non validi.' });
+      if (
+        !id ||
+        (trimmedDescription === undefined && completed === undefined)
+      ) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Dati attività non validi." });
       }
 
       await ensureAttivitaTable();
@@ -722,32 +1001,45 @@ async function startServer() {
       const params: any[] = [];
 
       if (trimmedDescription !== undefined) {
-        updates.push('description = ?');
+        updates.push("description = ?");
         params.push(trimmedDescription);
       }
       if (completed !== undefined) {
-        updates.push('completed = ?');
+        updates.push("completed = ?");
         params.push(isCompleted);
       }
       params.push(id);
 
-      await db.execute(`UPDATE attivita SET ${updates.join(', ')} WHERE id = ?`, params);
+      await db.execute(
+        `UPDATE attivita SET ${updates.join(", ")} WHERE id = ?`,
+        params
+      );
       return res.json({ success: true });
     } catch (error) {
-      console.error('Updating attivita failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante l\'aggiornamento dell\'attività.' });
+      console.error("Updating attivita failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Errore durante l'aggiornamento dell'attività."
+        });
     }
   });
 
-  app.delete('/api/attivita/:id', async (req, res) => {
+  app.delete("/api/attivita/:id", async (req, res) => {
     try {
       const { id } = req.params as { id: string };
       await ensureAttivitaTable();
-      await db.execute('DELETE FROM attivita WHERE id = ?', [id]);
+      await db.execute("DELETE FROM attivita WHERE id = ?", [id]);
       return res.json({ success: true });
     } catch (error) {
-      console.error('Deleting attivita failed', error);
-      return res.status(500).json({ success: false, message: 'Errore durante l\'eliminazione dell\'attività.' });
+      console.error("Deleting attivita failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Errore durante l'eliminazione dell'attività."
+        });
     }
   });
 
@@ -757,48 +1049,67 @@ async function startServer() {
     if (Array.isArray(row)) {
       return Number(row[0] ?? 0);
     }
-    if (typeof row === 'object') {
+    if (typeof row === "object") {
       const firstValue = Object.values(row)[0];
       return Number(firstValue ?? 0);
     }
     return 0;
   };
 
-  app.get('/api/giardinieri/count', async (req, res) => {
+  app.get("/api/giardinieri/count", async (req, res) => {
     try {
       await ensureGiardinieriTable();
-      const result = await db.execute('SELECT COUNT(*) FROM giardinieri', []);
+      const result = await db.execute("SELECT COUNT(*) FROM giardinieri", []);
       const count = extractCount(result);
       return res.json({ success: true, count });
     } catch (error) {
-      console.error('Counting giardinieri failed', error);
-      return res.status(500).json({ success: false, count: 0, message: 'Errore conteggio giardinieri.' });
+      console.error("Counting giardinieri failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          count: 0,
+          message: "Errore conteggio giardinieri."
+        });
     }
   });
 
-  app.get('/api/clienti/count', async (req, res) => {
+  app.get("/api/clienti/count", async (req, res) => {
     try {
       await ensureClientiTable();
-      const result = await db.execute('SELECT COUNT(*) FROM clienti', []);
+      const result = await db.execute("SELECT COUNT(*) FROM clienti", []);
       const count = extractCount(result);
       return res.json({ success: true, count });
     } catch (error) {
-      console.error('Counting clienti failed', error);
-      return res.status(500).json({ success: false, count: 0, message: 'Errore conteggio clienti.' });
+      console.error("Counting clienti failed", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          count: 0,
+          message: "Errore conteggio clienti."
+        });
     }
   });
 
-  app.get('/api/counts', async (req, res) => {
+  app.get("/api/counts", async (req, res) => {
     try {
       await ensureGiardinieriTable();
       await ensureClientiTable();
-      const [giardResult, clientResult, giardActiveResult, giardInactiveResult, activeResult, inactiveResult] = await Promise.all([
-        db.execute('SELECT COUNT(*) FROM giardinieri', []),
-        db.execute('SELECT COUNT(*) FROM clienti', []),
-        db.execute('SELECT COUNT(*) FROM giardinieri WHERE attivo = 1', []),
-        db.execute('SELECT COUNT(*) FROM giardinieri WHERE attivo = 0', []),
-        db.execute('SELECT COUNT(*) FROM clienti WHERE attivo = 1', []),
-        db.execute('SELECT COUNT(*) FROM clienti WHERE attivo = 0', []),
+      const [
+        giardResult,
+        clientResult,
+        giardActiveResult,
+        giardInactiveResult,
+        activeResult,
+        inactiveResult
+      ] = await Promise.all([
+        db.execute("SELECT COUNT(*) FROM giardinieri", []),
+        db.execute("SELECT COUNT(*) FROM clienti", []),
+        db.execute("SELECT COUNT(*) FROM giardinieri WHERE attivo = 1", []),
+        db.execute("SELECT COUNT(*) FROM giardinieri WHERE attivo = 0", []),
+        db.execute("SELECT COUNT(*) FROM clienti WHERE attivo = 1", []),
+        db.execute("SELECT COUNT(*) FROM clienti WHERE attivo = 0", [])
       ]);
       return res.json({
         success: true,
@@ -807,10 +1118,10 @@ async function startServer() {
         giardinieriInactiveCount: extractCount(giardInactiveResult),
         clientiCount: extractCount(clientResult),
         clientiActiveCount: extractCount(activeResult),
-        clientiInactiveCount: extractCount(inactiveResult),
+        clientiInactiveCount: extractCount(inactiveResult)
       });
     } catch (error) {
-      console.error('Counting totals failed', error);
+      console.error("Counting totals failed", error);
       return res.status(500).json({
         success: false,
         giardinieriCount: 0,
@@ -819,7 +1130,7 @@ async function startServer() {
         clientiCount: 0,
         clientiActiveCount: 0,
         clientiInactiveCount: 0,
-        message: 'Errore conteggio totali.',
+        message: "Errore conteggio totali."
       });
     }
   });

@@ -34,6 +34,9 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isPwaInstalled, setIsPwaInstalled] = useState(false);
+  const [installSuccess, setInstallSuccess] = useState(false);
+  const [wasPreviouslyInstalled, setWasPreviouslyInstalled] = useState(false);
+  const [showOpenAppHint, setShowOpenAppHint] = useState(false);
   const errorTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -57,6 +60,9 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as any).standalone === true;
 
+    const installedBefore =
+      window.localStorage.getItem("geogiardiniInstalled") === "1";
+    setWasPreviouslyInstalled(installedBefore);
     setIsPwaInstalled(isStandalone);
   }, []);
 
@@ -79,7 +85,11 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
     };
 
     const handleAppInstalled = () => {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("geogiardiniInstalled", "1");
+      }
       setIsPwaInstalled(true);
+      setInstallSuccess(true);
       setShowInstallButton(false);
       setDeferredPrompt(null);
     };
@@ -108,11 +118,19 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
     const choiceResult = await deferredPrompt.userChoice;
     if (choiceResult.outcome === "accepted") {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("geogiardiniInstalled", "1");
+      }
+      setInstallSuccess(true);
       setShowInstallButton(false);
       setDeferredPrompt(null);
     } else {
       setShowInstallButton(false);
     }
+  };
+
+  const handleOpenInstalledApp = () => {
+    setShowOpenAppHint(true);
   };
 
   useEffect(() => {
@@ -197,6 +215,9 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   const isAdmin = loginRole === "admin";
+  const showInstalledNotice =
+    (installSuccess || wasPreviouslyInstalled) && !isPwaInstalled;
+
   const firstLabel =
     loginRole === "admin"
       ? "Admin"
@@ -212,6 +233,50 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const secondLabel = isAdmin ? "Password" : "Codice";
   const secondPlaceholder = isAdmin ? "••••••••" : "Inserisci il codice";
   const secondType = isAdmin ? "password" : "text";
+
+  if (showInstalledNotice) {
+    return (
+      <div className="login-page login-page--installed">
+        <div className="login-page__top">
+          <div className="login-page__brand">
+            <div className="login-page__brand-icon">
+              <span className="material-symbols-outlined" aria-hidden="true">
+                park
+              </span>
+            </div>
+            <h1 className="login-page__title">GeoGiardini</h1>
+          </div>
+        </div>
+
+        <main className="login-page__main">
+          <div className="login-page__intro">
+            <h2>GeoGiardini installata!</h2>
+            <p>
+              L’app è già presente sul tuo dispositivo. Chiudi questa pagina e
+              apri GeoGiardini dall’icona sullo schermo.
+            </p>
+            <p>
+              Se hai aperto questo link dal browser, torna all’home screen e usa
+              l’icona creata dal sistema.
+            </p>
+            <button
+              type="button"
+              className="login-page__submit mt-6"
+              onClick={handleOpenInstalledApp}
+            >
+              Apri l’app installata
+            </button>
+            {showOpenAppHint && (
+              <p className="login-page__caption mt-4">
+                L’app può essere avviata solo dall’icona sul tuo dispositivo.
+                Chiudi questa scheda e usa l’icona GeoGiardini.
+              </p>
+            )}
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="login-page">

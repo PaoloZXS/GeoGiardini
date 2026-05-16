@@ -2095,19 +2095,25 @@ function AdminPage() {
                                   avviso.title
                                 );
                               const isAvvisoNotification =
-                                /^Nuovo avviso(?: per)?\s*:/i.test(
+                                /^(?:Nuovo\s+)?avviso(?:\s+inviato)?(?:\s+per)?\s*:/i.test(
                                   avviso.title
-                                ) || /^Nuovo avviso\s*:/i.test(avviso.title);
+                                ) ||
+                                /^(?:Avviso|Notifica(?:\s+inviata)?)\s*:/i.test(
+                                  avviso.title
+                                );
                               const titleValue =
                                 isAppointmentNotification ||
                                 isAvvisoNotification
                                   ? avviso.title
                                       .replace(
-                                        /^Nuovo (?:appuntamento|avviso)(?: per)?\s*:?\s*/i,
+                                        /^(?:Nuovo\s+)?(?:appuntamento|avviso)(?:\s+inviato)?(?:\s+per)?\s*:?\s*/i,
                                         ""
                                       )
                                       .trim()
                                   : "";
+                              const notificationLabel = isAvvisoNotification
+                                ? "Avviso inviato :"
+                                : "";
                               const rawMessage = avviso.message || "";
                               const clientFromMessageMatch =
                                 rawMessage.match(/^Cliente\s*:\s*(.+)$/im);
@@ -2170,7 +2176,8 @@ function AdminPage() {
                                 cleanedMessage || cleanedTitle || "";
                               const shouldShowNotificationText =
                                 notificationText &&
-                                notificationText !== cleanedActivityDetail;
+                                (notificationText !== cleanedActivityDetail ||
+                                  !!notificationLabel);
                               const createdAt = new Date(avviso.created_at);
                               const dateOnly =
                                 createdAt.toLocaleDateString("it-IT");
@@ -2237,7 +2244,16 @@ function AdminPage() {
                                     </p>
                                     {shouldShowNotificationText ? (
                                       <p className="text-on-surface">
-                                        {notificationText}
+                                        {notificationLabel ? (
+                                          <>
+                                            <span className="font-semibold text-on-surface">
+                                              {notificationLabel}
+                                            </span>{" "}
+                                            <span>{notificationText}</span>
+                                          </>
+                                        ) : (
+                                          <span>{notificationText}</span>
+                                        )}
                                       </p>
                                     ) : null}
                                     {cleanedActivityDetail ? (

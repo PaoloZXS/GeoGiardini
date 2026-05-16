@@ -1,36 +1,119 @@
-import { FormEvent, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import AuthField from '../components/AuthField';
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import AuthField from "../components/AuthField";
 
 type LoginPageProps = {
-  onLoginSuccess: (role: 'admin' | 'cliente' | 'giardiniere') => void;
+  onLoginSuccess: (role: "admin" | "cliente" | "giardiniere") => void;
 };
 
-type UserRole = 'admin' | 'cliente' | 'giardiniere';
+type UserRole = "admin" | "cliente" | "giardiniere";
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{
+    outcome: "accepted" | "dismissed";
+    platform?: string;
+  }>;
+};
 
 function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const navigate = useNavigate();
   const [loginRole, setLoginRole] = useState<UserRole>(() => {
-    if (typeof window === 'undefined') return 'admin';
-    const stored = window.localStorage.getItem('loginRole');
-    return stored === 'cliente' || stored === 'giardiniere' || stored === 'admin' ? stored : 'admin';
+    if (typeof window === "undefined") return "admin";
+    const stored = window.localStorage.getItem("loginRole");
+    return stored === "cliente" ||
+      stored === "giardiniere" ||
+      stored === "admin"
+      ? stored
+      : "admin";
   });
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showInstallButton, setShowInstallButton] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [isPwaInstalled, setIsPwaInstalled] = useState(false);
   const errorTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    setUsername('');
-    setPassword('');
-    setError('');
+    setUsername("");
+    setPassword("");
+    setError("");
   }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('loginRole', loginRole);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("loginRole", loginRole);
     }
   }, [loginRole]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true;
+
+    setIsPwaInstalled(isStandalone);
+  }, []);
+
+  useEffect(() => {
+    if (isPwaInstalled) {
+      setShowInstallButton(false);
+      setDeferredPrompt(null);
+    }
+  }, [isPwaInstalled]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
+      setShowInstallButton(true);
+    };
+
+    const handleAppInstalled = () => {
+      setIsPwaInstalled(true);
+      setShowInstallButton(false);
+      setDeferredPrompt(null);
+    };
+
+    window.addEventListener(
+      "beforeinstallprompt",
+      handleBeforeInstallPrompt as EventListener
+    );
+    window.addEventListener("appinstalled", handleAppInstalled);
+
+    return () => {
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt as EventListener
+      );
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      return;
+    }
+
+    deferredPrompt.prompt();
+
+    const choiceResult = await deferredPrompt.userChoice;
+    if (choiceResult.outcome === "accepted") {
+      setShowInstallButton(false);
+      setDeferredPrompt(null);
+    } else {
+      setShowInstallButton(false);
+    }
+  };
 
   useEffect(() => {
     if (!error) {
@@ -42,7 +125,7 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
     }
 
     errorTimeoutRef.current = window.setTimeout(() => {
-      setError('');
+      setError("");
       errorTimeoutRef.current = null;
     }, 2000);
 
@@ -56,69 +139,79 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (loginRole === 'admin') {
-      if (username === 'Angelo' && password === 'A2026') {
-        onLoginSuccess('admin');
-        navigate('/admin');
+    if (loginRole === "admin") {
+      if (username === "Angelo" && password === "A2026") {
+        onLoginSuccess("admin");
+        navigate("/admin");
         return;
       }
-      setError('Credenziali admin errate. Riprovare');
+      setError("Credenziali admin errate. Riprovare");
       return;
     }
 
     if (!username.trim() || !password.trim()) {
-      setError('Inserisci nome e codice.');
+      setError("Inserisci nome e codice.");
       return;
     }
 
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           role: loginRole,
           username: username.trim(),
-          code: password.trim(),
-        }),
+          code: password.trim()
+        })
       });
 
       const result = await response.json();
       if (!response.ok || !result.success) {
-        setError(result.message || 'Credenziali errate. Riprovare');
+        setError(result.message || "Credenziali errate. Riprovare");
         return;
       }
 
       if (!result.id) {
-        setError('Login riuscito ma id utente mancante. Riprova.');
+        setError("Login riuscito ma id utente mancante. Riprova.");
         return;
       }
 
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem('loginRole', loginRole);
-        window.localStorage.setItem('loginUsername', username.trim());
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("loginRole", loginRole);
+        window.localStorage.setItem("loginUsername", username.trim());
         if (result.id) {
-          window.localStorage.setItem('userId', result.id.toString());
+          window.localStorage.setItem("userId", result.id.toString());
         }
       }
 
       onLoginSuccess(loginRole);
-      if (loginRole === 'cliente') {
-        navigate('/cliente');
+      if (loginRole === "cliente") {
+        navigate("/cliente");
       } else {
-        navigate('/giardiniere');
+        navigate("/giardiniere");
       }
     } catch (error) {
       console.error(error);
-      setError('Errore di rete durante il login. Riprova.');
+      setError("Errore di rete durante il login. Riprova.");
     }
   };
 
-  const isAdmin = loginRole === 'admin';
-  const firstLabel = loginRole === 'admin' ? 'Admin' : loginRole === 'cliente' ? 'Nome Cliente' : 'Nome Giardiniere';
-  const firstPlaceholder = loginRole === 'admin' ? 'Inserisci Admin' : loginRole === 'cliente' ? 'Inserisci Nome Cliente' : 'Inserisci Nome Giardiniere';
-  const secondLabel = isAdmin ? 'Password' : 'Codice';
-  const secondPlaceholder = isAdmin ? '••••••••' : 'Inserisci il codice';
-  const secondType = isAdmin ? 'password' : 'text';
+  const isAdmin = loginRole === "admin";
+  const firstLabel =
+    loginRole === "admin"
+      ? "Admin"
+      : loginRole === "cliente"
+        ? "Nome Cliente"
+        : "Nome Giardiniere";
+  const firstPlaceholder =
+    loginRole === "admin"
+      ? "Inserisci Admin"
+      : loginRole === "cliente"
+        ? "Inserisci Nome Cliente"
+        : "Inserisci Nome Giardiniere";
+  const secondLabel = isAdmin ? "Password" : "Codice";
+  const secondPlaceholder = isAdmin ? "••••••••" : "Inserisci il codice";
+  const secondType = isAdmin ? "password" : "text";
 
   return (
     <div className="login-page">
@@ -139,25 +232,45 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
           <p>Gestione completa delle aree verdi</p>
         </div>
 
-        <form className="login-page__form" autoComplete="off" onSubmit={handleSubmit}>
+        {showInstallButton && (
+          <div className="login-page__install-wrapper">
+            <button
+              type="button"
+              className="login-page__install-button"
+              onClick={handleInstallClick}
+            >
+              Installa GeoGiardini
+            </button>
+          </div>
+        )}
+
+        <form
+          className="login-page__form"
+          autoComplete="off"
+          onSubmit={handleSubmit}
+        >
           <div className="flex items-center justify-between gap-3 mb-4">
-            {(['admin', 'cliente', 'giardiniere'] as UserRole[]).map((role) => (
+            {(["admin", "cliente", "giardiniere"] as UserRole[]).map((role) => (
               <button
                 key={role}
                 type="button"
                 className={`h-11 flex-1 rounded-full border px-4 text-sm font-bold transition ${
                   loginRole === role
-                    ? 'border-primary bg-primary text-on-primary'
-                    : 'border-outline-variant bg-surface text-on-surface hover:bg-surface-container-high'
+                    ? "border-primary bg-primary text-on-primary"
+                    : "border-outline-variant bg-surface text-on-surface hover:bg-surface-container-high"
                 }`}
                 onClick={() => {
                   setLoginRole(role);
-                  setUsername('');
-                  setPassword('');
-                  setError('');
+                  setUsername("");
+                  setPassword("");
+                  setError("");
                 }}
               >
-                {role === 'admin' ? 'Admin' : role === 'cliente' ? 'Cliente' : 'Giardiniere'}
+                {role === "admin"
+                  ? "Admin"
+                  : role === "cliente"
+                    ? "Cliente"
+                    : "Giardiniere"}
               </button>
             ))}
           </div>
@@ -177,10 +290,10 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
             label={secondLabel}
             type={secondType}
             placeholder={secondPlaceholder}
-            icon={isAdmin ? 'lock' : 'key'}
+            icon={isAdmin ? "lock" : "key"}
             value={password}
             onChange={(value) => setPassword(value)}
-            autoComplete={isAdmin ? 'new-password' : 'off'}
+            autoComplete={isAdmin ? "new-password" : "off"}
           />
 
           <div className="login-page__actions">
@@ -192,13 +305,19 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
       </main>
 
       {error && (
-        <div className="login-page__error-overlay" role="alert" aria-live="assertive">
+        <div
+          className="login-page__error-overlay"
+          role="alert"
+          aria-live="assertive"
+        >
           <div className="login-page__error-message">{error}</div>
         </div>
       )}
 
-      <footer className="login-page__footer" style={{ marginTop: '3rem' }}>
-        <p className="login-page__powered-by">Powered by Spectrum Italia 2026</p>
+      <footer className="login-page__footer" style={{ marginTop: "3rem" }}>
+        <p className="login-page__powered-by">
+          Powered by Spectrum Italia 2026
+        </p>
       </footer>
 
       <div className="login-page__background">

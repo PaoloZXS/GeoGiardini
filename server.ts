@@ -171,12 +171,10 @@ async function startServer() {
       const isActive = attivo ? 1 : 0;
 
       if (!trimmedUsername || !trimmedCodice) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Username e codice sono obbligatori."
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Username e codice sono obbligatori."
+        });
       }
 
       await ensureGiardinieriTable();
@@ -187,12 +185,10 @@ async function startServer() {
       );
 
       if (existing.rows.length > 0) {
-        return res
-          .status(409)
-          .json({
-            success: false,
-            message: "Username già presente. Usa un altro username."
-          });
+        return res.status(409).json({
+          success: false,
+          message: "Username già presente. Usa un altro username."
+        });
       }
 
       await db.execute(
@@ -225,13 +221,11 @@ async function startServer() {
       return res.json({ success: true, giardinieri: result.rows || [] });
     } catch (error) {
       console.error("Fetching giardinieri failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          giardinieri: [],
-          message: "Errore caricamento giardinieri."
-        });
+      return res.status(500).json({
+        success: false,
+        giardinieri: [],
+        message: "Errore caricamento giardinieri."
+      });
     }
   });
 
@@ -248,12 +242,10 @@ async function startServer() {
       const isActive = attivo ? 1 : 0;
 
       if (!trimmedUsername || !trimmedCodice) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Username e codice sono obbligatori."
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Username e codice sono obbligatori."
+        });
       }
 
       await ensureGiardinieriTable();
@@ -264,12 +256,10 @@ async function startServer() {
       );
 
       if (existing.rows.length > 0) {
-        return res
-          .status(409)
-          .json({
-            success: false,
-            message: "Username già presente. Usa un altro username."
-          });
+        return res.status(409).json({
+          success: false,
+          message: "Username già presente. Usa un altro username."
+        });
       }
 
       await db.execute(
@@ -349,12 +339,10 @@ async function startServer() {
       const isActive = attivo ? 1 : 0;
 
       if (!trimmedNome || !trimmedIndirizzo || !trimmedCodice) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Nome, indirizzo e codice sono obbligatori."
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Nome, indirizzo e codice sono obbligatori."
+        });
       }
 
       await ensureClientiTable();
@@ -365,12 +353,10 @@ async function startServer() {
       );
 
       if (existingClient.rows.length > 0) {
-        return res
-          .status(409)
-          .json({
-            success: false,
-            message: "Cliente già presente. Usa un altro nome."
-          });
+        return res.status(409).json({
+          success: false,
+          message: "Cliente già presente. Usa un altro nome."
+        });
       }
 
       await db.execute(
@@ -387,12 +373,10 @@ async function startServer() {
       return res.json({ success: true });
     } catch (error) {
       console.error("Saving clienti failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Errore durante il salvataggio cliente."
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Errore durante il salvataggio cliente."
+      });
     }
   });
 
@@ -406,13 +390,11 @@ async function startServer() {
       return res.json({ success: true, clienti: result.rows || [] });
     } catch (error) {
       console.error("Fetching clienti failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          clienti: [],
-          message: "Errore caricamento clienti."
-        });
+      return res.status(500).json({
+        success: false,
+        clienti: [],
+        message: "Errore caricamento clienti."
+      });
     }
   });
 
@@ -433,12 +415,10 @@ async function startServer() {
       const isActive = attivo ? 1 : 0;
 
       if (!trimmedNome || !trimmedIndirizzo || !trimmedCodice) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Nome, indirizzo e codice sono obbligatori."
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Nome, indirizzo e codice sono obbligatori."
+        });
       }
 
       await ensureClientiTable();
@@ -449,12 +429,10 @@ async function startServer() {
       );
 
       if (existing.rows.length > 0) {
-        return res
-          .status(409)
-          .json({
-            success: false,
-            message: "Cliente già presente. Usa un altro nome."
-          });
+        return res.status(409).json({
+          success: false,
+          message: "Cliente già presente. Usa un altro nome."
+        });
       }
 
       await db.execute(
@@ -472,12 +450,10 @@ async function startServer() {
       return res.json({ success: true });
     } catch (error) {
       console.error("Updating cliente failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Errore durante l'aggiornamento cliente."
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Errore durante l'aggiornamento cliente."
+      });
     }
   });
 
@@ -491,12 +467,10 @@ async function startServer() {
       return res.json({ success: true });
     } catch (error) {
       console.error("Deleting cliente failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Errore durante l'eliminazione cliente."
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Errore durante l'eliminazione cliente."
+      });
     }
   });
 
@@ -589,12 +563,10 @@ async function startServer() {
         !trimmedClienteId ||
         selectedGiardinieri.length === 0
       ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Data, cliente e almeno un giardiniere sono obbligatori."
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Data, cliente e almeno un giardiniere sono obbligatori."
+        });
       }
 
       await ensureClientiTable();
@@ -662,12 +634,14 @@ async function startServer() {
       return res.json({ success: true });
     } catch (error) {
       console.error("Saving appuntamento failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Errore durante il salvataggio dell'appuntamento."
-        });
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Errore interno del server durante il salvataggio dell'appuntamento.";
+      return res.status(500).json({
+        success: false,
+        message: errorMessage
+      });
     }
   });
 
@@ -771,13 +745,11 @@ async function startServer() {
       });
     } catch (error) {
       console.error("Fetching appuntamenti failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          appointments: [],
-          message: "Errore caricamento appuntamenti."
-        });
+      return res.status(500).json({
+        success: false,
+        appointments: [],
+        message: "Errore caricamento appuntamenti."
+      });
     }
   });
 
@@ -813,13 +785,11 @@ async function startServer() {
       return res.json({ success: true, notifiche: rows });
     } catch (error) {
       console.error("Fetching notifiche failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          notifiche: [],
-          message: "Errore caricamento notifiche."
-        });
+      return res.status(500).json({
+        success: false,
+        notifiche: [],
+        message: "Errore caricamento notifiche."
+      });
     }
   });
 
@@ -865,12 +835,10 @@ async function startServer() {
       }
 
       if (recipients.length === 0) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Nessun giardiniere selezionato o attivo."
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Nessun giardiniere selezionato o attivo."
+        });
       }
 
       const createdAt = new Date().toISOString();
@@ -893,12 +861,10 @@ async function startServer() {
       return res.json({ success: true });
     } catch (error) {
       console.error("Creating notifiche failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Errore durante la creazione dell'avviso."
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Errore durante la creazione dell'avviso."
+      });
     }
   });
 
@@ -916,12 +882,10 @@ async function startServer() {
       return res.json({ success: true });
     } catch (error) {
       console.error("Marking notification read failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Errore durante l'aggiornamento della notifica."
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Errore durante l'aggiornamento della notifica."
+      });
     }
   });
 
@@ -931,12 +895,10 @@ async function startServer() {
       const trimmedDescription = description?.toString().trim();
 
       if (!trimmedDescription) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "La descrizione dell'attività è obbligatoria."
-          });
+        return res.status(400).json({
+          success: false,
+          message: "La descrizione dell'attività è obbligatoria."
+        });
       }
 
       await ensureAttivitaTable();
@@ -948,12 +910,10 @@ async function startServer() {
       return res.json({ success: true });
     } catch (error) {
       console.error("Saving attivita failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Errore durante il salvataggio dell'attività."
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Errore durante il salvataggio dell'attività."
+      });
     }
   });
 
@@ -967,13 +927,11 @@ async function startServer() {
       return res.json({ success: true, attivita: result.rows || [] });
     } catch (error) {
       console.error("Fetching attivita failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          attivita: [],
-          message: "Errore caricamento attività."
-        });
+      return res.status(500).json({
+        success: false,
+        attivita: [],
+        message: "Errore caricamento attività."
+      });
     }
   });
 
@@ -1017,12 +975,10 @@ async function startServer() {
       return res.json({ success: true });
     } catch (error) {
       console.error("Updating attivita failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Errore durante l'aggiornamento dell'attività."
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Errore durante l'aggiornamento dell'attività."
+      });
     }
   });
 
@@ -1034,12 +990,10 @@ async function startServer() {
       return res.json({ success: true });
     } catch (error) {
       console.error("Deleting attivita failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Errore durante l'eliminazione dell'attività."
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Errore durante l'eliminazione dell'attività."
+      });
     }
   });
 
@@ -1064,13 +1018,11 @@ async function startServer() {
       return res.json({ success: true, count });
     } catch (error) {
       console.error("Counting giardinieri failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          count: 0,
-          message: "Errore conteggio giardinieri."
-        });
+      return res.status(500).json({
+        success: false,
+        count: 0,
+        message: "Errore conteggio giardinieri."
+      });
     }
   });
 
@@ -1082,13 +1034,11 @@ async function startServer() {
       return res.json({ success: true, count });
     } catch (error) {
       console.error("Counting clienti failed", error);
-      return res
-        .status(500)
-        .json({
-          success: false,
-          count: 0,
-          message: "Errore conteggio clienti."
-        });
+      return res.status(500).json({
+        success: false,
+        count: 0,
+        message: "Errore conteggio clienti."
+      });
     }
   });
 

@@ -1743,9 +1743,13 @@ function AdminPage() {
                   <button
                     type="button"
                     onClick={() => openAvvisiModal("unread")}
-                    className="rounded-2xl border border-outline-variant bg-surface-container-low p-3 text-left transition hover:border-primary hover:bg-surface-container-high"
+                    className="rounded-2xl border border-outline-variant p-3 text-left transition hover:border-primary"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, rgba(248, 113, 113, 1), rgba(185, 28, 28, 0.35))"
+                    }}
                   >
-                    <p className="font-label-sm text-label-sm text-on-surface-variant">
+                    <p className="font-label-sm text-label-sm font-semibold text-on-surface underline">
                       Da leggere
                     </p>
                     <p className="font-headline-sm text-headline-sm text-on-surface">
@@ -1755,9 +1759,13 @@ function AdminPage() {
                   <button
                     type="button"
                     onClick={() => openAvvisiModal("read")}
-                    className="rounded-2xl border border-outline-variant bg-surface-container-low p-3 text-left transition hover:border-primary hover:bg-surface-container-high"
+                    className="rounded-2xl border border-outline-variant p-3 text-left transition hover:border-primary"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, rgba(255, 245, 207, 1), rgba(236, 179, 62, 1))"
+                    }}
                   >
-                    <p className="font-label-sm text-label-sm text-on-surface-variant">
+                    <p className="font-label-sm text-label-sm font-semibold text-on-surface underline">
                       Confermati
                     </p>
                     <p className="font-headline-sm text-headline-sm text-on-surface">
@@ -1767,8 +1775,8 @@ function AdminPage() {
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   <div className="space-y-2">
-                    <label className="font-label-sm text-label-sm admin-page__modal-label block px-2">
-                      Cliente
+                    <label className="font-label-sm text-label-md admin-page__modal-label block px-2">
+                      Cliente interessato
                     </label>
                     <div className="relative">
                       <select
@@ -1791,8 +1799,8 @@ function AdminPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="font-label-sm text-label-sm admin-page__modal-label block px-2">
-                      Giardinieri
+                    <label className="font-label-sm text-label-md admin-page__modal-label block px-2">
+                      Giardinieri da avvisare
                     </label>
                     <div className="relative">
                       <select
@@ -1850,8 +1858,8 @@ function AdminPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="font-label-sm text-label-sm admin-page__modal-label block px-2">
-                      Messaggio
+                    <label className="font-label-sm text-label-md admin-page__modal-label block px-2">
+                      Messaggio per il Giardiniere
                     </label>
                     <textarea
                       className="w-full min-h-[120px] resize-none bg-white border border-outline-variant rounded-lg px-3 py-2 font-body-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
@@ -2251,7 +2259,7 @@ function AdminPage() {
               >
                 <div className="grid grid-cols-1 gap-3">
                   <div className="space-y-1">
-                    <label className="font-label-sm text-label-sm text-on-surface block px-2">
+                    <label className="font-label-sm text-label-md text-on-surface block px-2">
                       Data
                     </label>
                     <div className="relative">
@@ -2266,7 +2274,7 @@ function AdminPage() {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label className="font-label-sm text-label-sm text-on-surface block px-2">
+                    <label className="font-label-sm text-label-md text-on-surface block px-2">
                       Cliente
                     </label>
                     <div className="relative">
@@ -2292,7 +2300,7 @@ function AdminPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="font-label-sm text-label-sm text-on-surface block px-2">
+                  <label className="font-label-sm text-label-md text-on-surface block px-2">
                     Scegli giardiniere
                   </label>
                   <div className="space-y-1">
@@ -2366,7 +2374,7 @@ function AdminPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="font-label-sm text-label-sm text-on-surface block px-1">
+                  <label className="font-label-sm text-label-md text-on-surface block px-1">
                     Scegli attività
                   </label>
                   <div className="space-y-1">
@@ -2434,7 +2442,7 @@ function AdminPage() {
                 </div>
 
                 <div className="space-y-xs">
-                  <label className="font-label-sm text-label-sm text-on-surface block px-1">
+                  <label className="font-label-sm text-label-md text-on-surface block px-1">
                     Note per il giardiniere
                   </label>
                   <textarea

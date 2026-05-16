@@ -203,7 +203,7 @@
 .auth-field__label {
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--brand-blue);
+  color: #000000;
   margin-left: 0.75rem;
 }
 
@@ -335,9 +335,13 @@
   color: #9ca3af;
 }
 
+.login-page__footer p.login-page__powered-by {
+  color: #000000;
+}
+
 .login-page__powered-by {
   font-size: 0.75rem;
-  color: #8b95a1;
+  color: #000000;
 }
 
 .login-page__error-overlay {

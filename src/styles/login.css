@@ -87,9 +87,12 @@
 }
 
 .admin-page__modal-heading,
-.admin-page__modal-heading-icon,
-.admin-page__modal-label {
+.admin-page__modal-heading-icon {
   color: var(--brand-blue);
+}
+
+.admin-page__modal-label {
+  color: #000000;
 }
 
 .login-page {

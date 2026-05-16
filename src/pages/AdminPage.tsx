@@ -361,6 +361,13 @@ function AdminPage() {
     setStatusType(null);
   };
 
+  const clearAttivitaForm = () => {
+    setEditingAttivitaId(null);
+    setAttivitaDescrizione("");
+    setStatusMessage(null);
+    setStatusType(null);
+  };
+
   const handleClearClienteForm = () => {
     setEditingClienteId(null);
     setNomeCliente("");
@@ -1466,7 +1473,7 @@ function AdminPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm font-bold admin-page__modal-label mt-2 pl-2">
-                  <label className="inline-flex items-center gap-2">
+                  <label className="inline-flex items-center gap-2 text-black">
                     <input
                       type="checkbox"
                       className="h-4 w-4 accent-primary"
@@ -1475,13 +1482,13 @@ function AdminPage() {
                         setClienteAttivo(event.target.checked)
                       }
                     />
-                    {clienteAttivo ? "Attivo" : "Non attivo"}
+                    {clienteAttivo ? "Cliente Attivo" : "Cliente Non attivo"}
                   </label>
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-hidden">
-                  <div className="mb-1">
-                    <p className="pl-2 font-label-lg text-label-lg admin-page__modal-label italic font-bold">
+                  <div className="mb-1 flex justify-end pr-2">
+                    <p className="text-right font-label-lg text-label-lg admin-page__modal-label italic font-bold">
                       Clienti registrati:{" "}
                       <span className="font-bold">{clientiCount}</span>
                     </p>
@@ -1576,21 +1583,25 @@ function AdminPage() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <span
-                  className="material-symbols-outlined text-white text-3xl"
+                  className="material-symbols-outlined admin-page__modal-heading-icon text-3xl"
                   data-icon="assignment_add"
                 >
                   assignment_add
                 </span>
-                <h3 className="font-label-lg text-xl font-semibold text-white">
+                <h3 className="font-label-lg text-xl font-semibold admin-page__modal-heading">
                   {editingAttivitaId ? "Modifica Attività" : "Nuova Attività"}
                 </h3>
                 <button
                   type="button"
-                  className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-black text-3xl leading-none shadow-sm hover:bg-surface-container-high focus:outline-none focus:ring-2 focus:ring-primary"
-                  onClick={handleCloseForm}
-                  aria-label="Chiudi attività"
+                  className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary text-3xl leading-none shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    clearAttivitaForm();
+                  }}
+                  aria-label="Pulisci campi attività"
                 >
-                  <span className="material-symbols-outlined text-[22px] leading-none">
+                  <span className="material-symbols-outlined text-on-primary text-[22px] leading-none">
                     cleaning_services
                   </span>
                 </button>
@@ -1600,7 +1611,7 @@ function AdminPage() {
                 onSubmit={handleSaveAttivita}
               >
                 <div className="space-y-2">
-                  <label className="font-label-lg text-label-lg text-white font-bold block">
+                  <label className="font-label-lg text-label-lg admin-page__modal-label font-bold block">
                     Descrizione Attività
                   </label>
                   <input
@@ -1616,7 +1627,7 @@ function AdminPage() {
 
                 <div className="flex-1 min-h-0 overflow-hidden">
                   <div className="mb-3 space-y-2">
-                    <p className="font-label-lg text-label-lg text-white italic font-bold">
+                    <p className="font-label-lg text-label-lg admin-page__modal-label italic font-bold">
                       Attività inserite:{" "}
                       <span className="font-bold">{attivitaList.length}</span>
                     </p>
@@ -1639,7 +1650,7 @@ function AdminPage() {
                               handleSelectAttivita(item);
                             }
                           }}
-                          className="flex items-center justify-between rounded-xl p-3 transition bg-surface-container-lowest"
+                          className="flex items-center justify-between rounded-xl p-2 transition bg-emerald-100 hover:bg-emerald-200"
                         >
                           <div className="min-w-0 flex-1">
                             <p className="font-label-lg text-label-lg truncate text-on-surface">
@@ -1649,7 +1660,7 @@ function AdminPage() {
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
-                              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-error/10 text-error hover:bg-error/20 transition-colors"
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-error/10 text-error hover:bg-error/20 transition-colors"
                               onClick={(event) => {
                                 event.stopPropagation();
                                 openDeleteConfirmation(
@@ -1660,7 +1671,7 @@ function AdminPage() {
                               }}
                               aria-label={`Elimina attività ${item.description}`}
                             >
-                              <span className="material-symbols-outlined text-lg">
+                              <span className="material-symbols-outlined text-base">
                                 delete
                               </span>
                             </button>
@@ -1705,21 +1716,23 @@ function AdminPage() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <span
-                  className="material-symbols-outlined text-white text-3xl"
+                  className="material-symbols-outlined admin-page__modal-heading-icon text-3xl"
                   data-icon="send"
                 >
                   send
                 </span>
-                <h3 className="font-label-lg text-xl font-semibold text-white">
+                <h3 className="font-label-lg text-xl font-semibold admin-page__modal-heading">
                   Avvisi
                 </h3>
                 <button
                   type="button"
                   onClick={clearAvvisoForm}
-                  className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white text-black transition hover:bg-surface-container-high"
+                  className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary text-3xl leading-none shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary"
                   aria-label="Pulisci modulo avvisi"
                 >
-                  <span className="material-symbols-outlined">add</span>
+                  <span className="material-symbols-outlined text-on-primary text-[22px] leading-none">
+                    cleaning_services
+                  </span>
                 </button>
               </div>
               <form
@@ -1754,7 +1767,7 @@ function AdminPage() {
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   <div className="space-y-2">
-                    <label className="font-label-sm text-label-sm text-white block px-2">
+                    <label className="font-label-sm text-label-sm admin-page__modal-label block px-2">
                       Cliente
                     </label>
                     <div className="relative">
@@ -1778,7 +1791,7 @@ function AdminPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="font-label-sm text-label-sm text-white block px-2">
+                    <label className="font-label-sm text-label-sm admin-page__modal-label block px-2">
                       Giardinieri
                     </label>
                     <div className="relative">
@@ -1837,7 +1850,7 @@ function AdminPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="font-label-sm text-label-sm text-white block px-2">
+                    <label className="font-label-sm text-label-sm admin-page__modal-label block px-2">
                       Messaggio
                     </label>
                     <textarea
@@ -2209,14 +2222,28 @@ function AdminPage() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <span
-                  className="material-symbols-outlined text-white text-3xl"
+                  className="material-symbols-outlined admin-page__modal-heading-icon text-3xl"
                   data-icon="event"
                 >
                   event
                 </span>
-                <h3 className="font-label-lg text-xl font-semibold text-white">
+                <h3 className="font-label-lg text-xl font-semibold admin-page__modal-heading">
                   Appuntamento singolo
                 </h3>
+                <button
+                  type="button"
+                  className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary text-3xl leading-none shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    clearAppuntamentoForm();
+                  }}
+                  aria-label="Pulisci campi appuntamento"
+                >
+                  <span className="material-symbols-outlined text-on-primary text-[22px] leading-none">
+                    cleaning_services
+                  </span>
+                </button>
               </div>
               <form
                 className="flex-1 flex flex-col gap-md overflow-hidden"
@@ -2224,7 +2251,7 @@ function AdminPage() {
               >
                 <div className="grid grid-cols-1 gap-3">
                   <div className="space-y-1">
-                    <label className="font-label-sm text-label-sm text-white block px-2">
+                    <label className="font-label-sm text-label-sm text-on-surface block px-2">
                       Data
                     </label>
                     <div className="relative">
@@ -2239,7 +2266,7 @@ function AdminPage() {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label className="font-label-sm text-label-sm text-white block px-2">
+                    <label className="font-label-sm text-label-sm text-on-surface block px-2">
                       Cliente
                     </label>
                     <div className="relative">
@@ -2265,7 +2292,7 @@ function AdminPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="font-label-sm text-label-sm text-white block px-2">
+                  <label className="font-label-sm text-label-sm text-on-surface block px-2">
                     Scegli giardiniere
                   </label>
                   <div className="space-y-1">
@@ -2339,7 +2366,7 @@ function AdminPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="font-label-sm text-label-sm text-white block px-1">
+                  <label className="font-label-sm text-label-sm text-on-surface block px-1">
                     Scegli attività
                   </label>
                   <div className="space-y-1">
@@ -2407,7 +2434,7 @@ function AdminPage() {
                 </div>
 
                 <div className="space-y-xs">
-                  <label className="font-label-sm text-label-sm text-white block px-1">
+                  <label className="font-label-sm text-label-sm text-on-surface block px-1">
                     Note per il giardiniere
                   </label>
                   <textarea
